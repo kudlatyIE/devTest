@@ -1,0 +1,68 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical" >
+
+    <TextView
+        android:id="@+id/text_msg"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/hello_world" />
+    
+    <TextView 
+        android:id="@+id/text_screen"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        />
+    <Button 
+        android:id="@+id/btn_getCameraParams"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="CAMERA PARAMS"
+        />
+    <Button 
+        android:id="@+id/btn_new_view"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="NEXT VIEW"
+        />
+    
+    <Button 
+        android:id="@+id/btn_check_connection"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="CHECK CONNECTION"
+        />
+    
+    
+    <TextView 
+        android:id="@+id/text_network_status"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        />
+    <LinearLayout 
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        >
+        
+        <Button 
+            android:id="@+id/btn_open_wifi"
+            android:layout_width="0dp"
+        	android:layout_height="wrap_content"
+        	android:layout_weight="1"
+        	android:gravity="center"
+        	android:text="OPEN WIFI"
+            />
+        <Button 
+            android:id="@+id/btn_open_mobile"
+            android:layout_width="0dp"
+        	android:layout_height="wrap_content"
+        	android:layout_weight="1"
+        	android:gravity="center"
+        	android:text="OPEN MOB"
+            />
+    </LinearLayout>
+
+</LinearLayout>

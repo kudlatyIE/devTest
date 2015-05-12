@@ -26,13 +26,14 @@ public class ToDoActivity extends Activity {
 		tvRequest = (TextView) findViewById(R.id.text_request);
 		btnDoit = (Button) findViewById(R.id.btn_return_stuff);
 		
-		MsgResult.setResult(true, "Done!");
-		result = MsgResult.getResult();
+		
 		
 		btnDoit.setOnClickListener(new OnClickListener(){
 
 			@Override
 			public void onClick(View v) {
+				MsgResult.setResult(true, "Well done Nick!");
+				result = MsgResult.getResult();
 				Intent intent = new Intent();
 				intent.putExtra("result", true);
 				setResult(11,intent);

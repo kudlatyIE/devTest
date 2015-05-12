@@ -25,7 +25,7 @@ public class ApiStarter {
 		System.out.println("API constructor - YES!!");
 	}
 	
-	public boolean startCamInfo(){
+	public boolean startCamInfo() throws Exception{
 //	public String startCamInfo(){
 		Fragment fr = new Fragment(){
 			@Override
@@ -50,7 +50,7 @@ public class ApiStarter {
 		FragmentTransaction ft = this.fm.beginTransaction();
 		ft.add(fr, "getUserName");
 		ft.commit();
-
+		if(isStart) throw new Exception("Buuuuu! Failure!");
 		return isStart;
 //		return msg;
 	}

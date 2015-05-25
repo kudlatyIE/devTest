@@ -5,5 +5,7 @@
     <string name="hello_world">Hello world!</string>
     <string name="title_activity_camera_stuff">CameraStuffActivity</string>
     <string name="title_activity_java_view">JavaViewActivity</string>
+    <string name="title_activity_to_do">ToDoActivity</string>
+    <string name="title_activity_get_result">GetResultActivity</string>
 
 </resources>

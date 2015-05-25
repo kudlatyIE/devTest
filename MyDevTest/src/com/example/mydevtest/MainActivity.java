@@ -14,7 +14,7 @@ import android.widget.TextView;
 public class MainActivity extends Activity {
 	
 	private TextView tvMsg, tvScreen, tvNet;
-	private Button btnCheckNet, btnOpenWifi, btnOpenMob, btnCamera, btnJavaView;
+	private Button btnCheckNet, btnOpenWifi, btnOpenMob, btnCamera, btnJavaView, btnForResult;
 	private String dev, screen;
 	private boolean isNet;
 	private InternetConnection ic;
@@ -32,6 +32,7 @@ public class MainActivity extends Activity {
 		btnOpenMob = (Button) findViewById(R.id.btn_open_mobile);
 		btnCamera = (Button) findViewById(R.id.btn_getCameraParams);
 		btnJavaView = (Button) findViewById(R.id.btn_new_view);
+		btnForResult = (Button) findViewById(R.id.btn_for_result);
 		btnOpenWifi.setVisibility(View.GONE);
 		btnOpenMob.setVisibility(View.GONE);
 		
@@ -44,6 +45,7 @@ public class MainActivity extends Activity {
 		btnOpenMob.setOnClickListener(button);
 		btnCamera.setOnClickListener(button);
 		btnJavaView.setOnClickListener(button);
+		btnForResult.setOnClickListener(button);
 		
 		
 		tvMsg.setText(dev);
@@ -99,6 +101,10 @@ public class MainActivity extends Activity {
 				break;
 			case R.id.btn_new_view:
 				intent = new Intent(getApplicationContext(),JavaViewActivity.class);
+				startActivity(intent);
+				break;
+			case R.id.btn_for_result:
+				intent = new Intent(getApplicationContext(), GetResultActivity.class);
 				startActivity(intent);
 				break;
 			}

@@ -44,6 +44,14 @@
             android:name=".JavaViewActivity"
             android:label="@string/title_activity_java_view" >
         </activity>
+        <activity
+            android:name=".ToDoActivity"
+            android:label="@string/title_activity_to_do" >
+        </activity>
+        <activity
+            android:name=".GetResultActivity"
+            android:label="@string/title_activity_get_result" >
+        </activity>
     </application>
 
 </manifest>

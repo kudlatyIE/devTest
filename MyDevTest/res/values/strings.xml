@@ -7,5 +7,6 @@
     <string name="title_activity_java_view">JavaViewActivity</string>
     <string name="title_activity_to_do">ToDoActivity</string>
     <string name="title_activity_get_result">GetResultActivity</string>
+    <string name="title_activity_sd">SDActivity</string>
 
 </resources>

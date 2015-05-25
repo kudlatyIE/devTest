@@ -2,6 +2,7 @@ package com.example.mydevtest;
 
 import com.example.network.InternetConnection;
 import com.example.utils.DevDetails;
+import com.example.utils.MySd;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -14,7 +15,7 @@ import android.widget.TextView;
 public class MainActivity extends Activity {
 	
 	private TextView tvMsg, tvScreen, tvNet;
-	private Button btnCheckNet, btnOpenWifi, btnOpenMob, btnCamera, btnJavaView, btnForResult;
+	private Button btnCheckNet, btnOpenWifi, btnOpenMob, btnCamera, btnJavaView, btnForResult, btnSd;
 	private String dev, screen;
 	private boolean isNet;
 	private InternetConnection ic;
@@ -35,6 +36,7 @@ public class MainActivity extends Activity {
 		btnForResult = (Button) findViewById(R.id.btn_for_result);
 		btnOpenWifi.setVisibility(View.GONE);
 		btnOpenMob.setVisibility(View.GONE);
+		btnSd = (Button) findViewById(R.id.btn_sd);
 		
 		dev = DevDetails.getDeviceName();
 		screen = DevDetails.getDensity(getApplicationContext());
@@ -46,6 +48,7 @@ public class MainActivity extends Activity {
 		btnCamera.setOnClickListener(button);
 		btnJavaView.setOnClickListener(button);
 		btnForResult.setOnClickListener(button);
+		btnSd.setOnClickListener(button);
 		
 		
 		tvMsg.setText(dev);
@@ -107,6 +110,9 @@ public class MainActivity extends Activity {
 				intent = new Intent(getApplicationContext(), GetResultActivity.class);
 				startActivity(intent);
 				break;
+			case R.id.btn_sd:
+				intent = new Intent(getApplicationContext(),SDActivity.class);
+				startActivity(intent);
 			}
 			
 		}

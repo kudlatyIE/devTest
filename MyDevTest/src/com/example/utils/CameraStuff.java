@@ -67,8 +67,8 @@ public class CameraStuff {
 		int camNumber = Camera.getNumberOfCameras();
 		System.out.println("Camera num: "+camNumber);
 		for (int i=0;i<camNumber;i++){
-			camera=null;
-			camera = Camera.open(i);
+//			camera=null;
+//			camera = Camera.open(i);
 			info = new CameraInfo();
 			Camera.getCameraInfo(i, info);
 			if( info.facing==CameraInfo.CAMERA_FACING_FRONT) id=i;

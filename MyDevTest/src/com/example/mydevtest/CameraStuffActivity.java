@@ -3,6 +3,7 @@ package com.example.mydevtest;
 import java.util.ArrayList;
 
 import com.example.utils.CameraStuff;
+import com.example.utils.ScreenStuff;
 
 import android.app.Activity;
 import android.content.Context;
@@ -21,9 +22,10 @@ public class CameraStuffActivity extends Activity {
 	
 	private ArrayList<CameraStuff> camList;
 	private CameraStuff camStuff;
-	private TextView tvCamId, tvSensorH, tvSensorW;
+	private TextView tvCamId, tvSensorH, tvSensorW, tvBarH;
 	private ListView lv;
 	private String cameraName;
+	private int barH;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -32,10 +34,18 @@ public class CameraStuffActivity extends Activity {
 		
 		camStuff = new CameraStuff(getApplicationContext());
 		camList=camStuff.getCamerasList();
+//		barH = ScreenStuff.getSystemBarHeight(getApplicationContext());
+		barH = ScreenStuff.getSystemBarHeight(getApplicationContext());
 		
+		tvBarH=(TextView) findViewById(R.id.camera_system_bar_height);
 		lv = (ListView) findViewById(R.id.list_cameras);
+		
+		tvBarH.setText("System Bar Height: "+barH);
+		System.out.println("System Bar Height: "+barH);
+		
 		MyAdapter adapter = new MyAdapter(getApplicationContext(),camList);
 		lv.setAdapter(adapter);
+		
 		
 	}//end onCreate
 	

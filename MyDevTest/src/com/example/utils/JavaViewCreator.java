@@ -9,6 +9,8 @@ import android.graphics.Color;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.ViewGroup.LayoutParams;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
@@ -22,6 +24,8 @@ public class JavaViewCreator {
 	private RelativeLayout rl;
 	private TextView tvHint, tvRepeat;
 	private ImageView ivPhoto;
+	private EditText etUserName;
+	private Button btnSave;
 	private JavaCameraView cView;
 	private int cameraId;
 	
@@ -29,8 +33,6 @@ public class JavaViewCreator {
 	
 	public JavaViewCreator(Activity ac){
 		this.ac = ac;
-		
-		
 	}
 	
 	public LinearLayout getFdLayout(){
@@ -106,6 +108,59 @@ public class JavaViewCreator {
 		rl.addView(tvHint, tvHintParams);
 		rl.addView(tvRepeat, tvRepeatParams);
 		
+		
+		return rl;
+	}
+	
+	public RelativeLayout getResultLayout(){
+		rl = new RelativeLayout(ac);
+		tvHint = new TextView(ac);
+		tvRepeat = new TextView(ac);
+		etUserName = new EditText(ac);
+		btnSave = new Button(ac);
+//		ivPhoto = new ImageView(ac);
+		//--------------------relative layout------------------------------------------------
+
+		RelativeLayout.LayoutParams rlParam = new RelativeLayout.LayoutParams(
+				RelativeLayout.LayoutParams.MATCH_PARENT,
+				RelativeLayout.LayoutParams.MATCH_PARENT);
+		rl.setLayoutParams(rlParam);
+		//----------------- text view top --------------------------------------------------
+		RelativeLayout.LayoutParams tvHintParams = new RelativeLayout.LayoutParams(
+				RelativeLayout.LayoutParams.MATCH_PARENT,//width
+				RelativeLayout.LayoutParams.WRAP_CONTENT);//height
+		tvHintParams.addRule(RelativeLayout.ALIGN_PARENT_TOP);
+		tvHintParams.addRule(RelativeLayout.TEXT_ALIGNMENT_CENTER);
+		tvHint.setGravity(Gravity.CENTER);
+		tvHint.setTextSize(TypedValue.COMPLEX_UNIT_SP, 35);
+		tvHint.setTextColor(Color.parseColor("#ffdd56"));
+		tvHint.setText("Please, Choose User Name:");
+		
+		//-------------------edit text field ---------------------------------------------
+		RelativeLayout.LayoutParams etNameParam = new RelativeLayout.LayoutParams(
+				RelativeLayout.LayoutParams.WRAP_CONTENT,//width
+				RelativeLayout.LayoutParams.WRAP_CONTENT);//height
+		etNameParam.addRule(RelativeLayout.CENTER_IN_PARENT);
+		etNameParam.addRule(RelativeLayout.TEXT_ALIGNMENT_CENTER);
+		etUserName.setGravity(Gravity.CENTER);
+		etUserName.setTextSize(TypedValue.COMPLEX_UNIT_SP, 35);
+		etUserName.setId(999909);
+		//------------------ btn save -----------------------------------------------------
+		RelativeLayout.LayoutParams btnSaveParam = new RelativeLayout.LayoutParams(
+				RelativeLayout.LayoutParams.WRAP_CONTENT,//width
+				RelativeLayout.LayoutParams.WRAP_CONTENT);//height
+		btnSaveParam.addRule(RelativeLayout.CENTER_IN_PARENT);
+		btnSaveParam.addRule(RelativeLayout.TEXT_ALIGNMENT_CENTER);
+		btnSaveParam.addRule(RelativeLayout.BELOW, etUserName.getId());
+		btnSave.setGravity(Gravity.CENTER);
+		btnSave.setTextSize(TypedValue.COMPLEX_UNIT_SP, 35);
+		btnSave.setText("SAVE");
+		btnSave.setId(999908);
+
+		rl.addView(tvHint, tvHintParams);
+		rl.addView(etUserName, etNameParam);
+		rl.addView(btnSave, btnSaveParam);
+//		rl.addView(tvRepeat, tvRepeatParams);
 		
 		return rl;
 	}

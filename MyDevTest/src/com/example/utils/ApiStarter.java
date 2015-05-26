@@ -20,7 +20,7 @@ public class ApiStarter {
 	
 	public ApiStarter(GetResultActivity getResultActivity){
 		this.activity=getResultActivity;
-		context = getResultActivity.getApplicationContext();
+		this.context = getResultActivity.getApplicationContext();
 		this.fm= getResultActivity.getFragmentManager();
 		System.out.println("API constructor - YES!!");
 	}

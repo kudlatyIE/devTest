@@ -17,7 +17,7 @@ public class MainActivity extends Activity {
 	private TextView tvMsg, tvScreen, tvNet;
 	private Button btnCheckNet, btnOpenWifi, btnOpenMob, btnCamera, btnJavaView, btnForResult, btnSd;
 	private String dev, screen;
-	private boolean isNet;
+	private boolean isNet, isWifi=false, isMob=false;
 	private InternetConnection ic;
 
 	@Override
@@ -75,27 +75,45 @@ public class MainActivity extends Activity {
 			case R.id.btn_check_connection:
 				
 				isNet = ic.isConnection();
-				if(isNet) tvNet.setText("internet connection ON");
+				if(isNet) {
+					tvNet.setText("internet connection ON");
+					if(isWifi) btnOpenWifi.setText("WiFi OFF");
+					if (isMob) btnOpenMob.setText("3G OFF");
+				}
 				else {
 					tvNet.setText("Buuuuu");
 					if(ic.getWifi()!=null) setVisibleBtn(btnOpenWifi,true);
 					if(ic.getMob()!=null) setVisibleBtn(btnOpenMob,true);
 				}
+				if(isWifi) btnOpenWifi.setText("WiFi OFF"); else btnOpenWifi.setText("WiFi ON");
+				if(isMob) btnOpenMob.setText("3G OFF"); else btnOpenMob.setText("3G ON");
 				break;
 			case R.id.btn_open_wifi:
-				isNet = ic.openWiFi();
-				if(isNet) {
+				
+				if(isWifi) {
+					isWifi=ic.openWiFi(false);
+					tvNet.setText("WiFi connection OFF!");
+					btnOpenWifi.setText("WiFi ON");
+//					setVisibleBtn(btnOpenWifi,false);
+//					setVisibleBtn(btnOpenMob,false);
+				}else{
+					isWifi = ic.openWiFi(true);
 					tvNet.setText("WiFi connection ON!");
-					setVisibleBtn(btnOpenWifi,false);
-					setVisibleBtn(btnOpenMob,false);
+					btnOpenWifi.setText("WiFi OFF");
 				}
 				break;
 			case R.id.btn_open_mobile:
-				isNet = ic.openMobile(true);
-				if(isNet) {
+				
+				if(isMob) {
+					isMob=ic.openMobile(false);
+					btnOpenMob.setText("3G ON");
+					tvNet.setText("MobileData connection OFF!");
+//					setVisibleBtn(btnOpenWifi,false);
+//					setVisibleBtn(btnOpenMob,false);
+				}else{
+					isMob = ic.openMobile(true);
+					btnOpenMob.setText("3G OFF");
 					tvNet.setText("MobileData connection ON!");
-					setVisibleBtn(btnOpenWifi,false);
-					setVisibleBtn(btnOpenMob,false);
 				}
 				break;
 			case R.id.btn_getCameraParams:

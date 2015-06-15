@@ -45,14 +45,14 @@ public class InternetConnection {
 		return isNet;
 	}
 	
-	public boolean openWiFi(){
+	public boolean openWiFi(boolean enabled ){
 		ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
 		if(cm!=null){
 //			NetworkInfo wifi = cm.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
 			WifiManager wm = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
-			return wm.setWifiEnabled(true);
+			wm.setWifiEnabled(enabled);
 		}
-		return false;
+		return enabled;
 	}
 	
 	public boolean openMobile(boolean enabled){

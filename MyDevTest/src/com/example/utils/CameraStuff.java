@@ -58,6 +58,25 @@ public class CameraStuff {
 		return list;
 	}
 	
+	private Camera getFrontCam(){
+		Camera c=null;
+		CameraInfo ci=null;
+		int w=0,h=0;
+		try{
+			c=Camera.open(1);
+			ci= new CameraInfo();
+			if(ci.facing==CameraInfo.CAMERA_FACING_FRONT){
+				w=c.getParameters().getPictureSize().width;
+				h=c.getParameters().getPictureSize().height;
+				return c;
+			}
+		}catch(Exception ex){
+			System.out.println("No front camera!");
+			ex.printStackTrace();
+		}
+		return null;
+	}
+	
 	@SuppressWarnings("deprecation")
 	public static int getFrontCameraId() throws Exception{
 		Camera camera;

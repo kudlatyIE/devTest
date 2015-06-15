@@ -22,7 +22,7 @@ public class CameraStuffActivity extends Activity {
 	
 	private ArrayList<CameraStuff> camList;
 	private CameraStuff camStuff;
-	private TextView tvCamId, tvSensorH, tvSensorW, tvBarH;
+	private TextView tvCamId, tvSensorH, tvSensorW, tvBarH, tvScreenSize;
 	private ListView lv;
 	private String cameraName;
 	private int barH;
@@ -37,9 +37,11 @@ public class CameraStuffActivity extends Activity {
 //		barH = ScreenStuff.getSystemBarHeight(getApplicationContext());
 		barH = ScreenStuff.getSystemBarHeight(getApplicationContext());
 		
+		tvScreenSize = (TextView) findViewById(R.id.camera_text_screen_info);
 		tvBarH=(TextView) findViewById(R.id.camera_system_bar_height);
 		lv = (ListView) findViewById(R.id.list_cameras);
 		
+		tvScreenSize.setText("Screen Size: "+ScreenStuff.getScreenSize(this));
 		tvBarH.setText("System Bar Height: "+barH);
 		System.out.println("System Bar Height: "+barH);
 		

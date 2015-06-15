@@ -13,6 +13,14 @@
         android:textColor="#000000"
         android:text="Dooda, Dooda!"
         />
+    
+    <TextView
+        android:id="@+id/camera_text_screen_info"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:textColor="#000000"
+        android:text="Scr size: " />
 
     <TextView
         android:id="@+id/camera_text_info"

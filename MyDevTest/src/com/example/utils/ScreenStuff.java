@@ -1,8 +1,10 @@
 package com.example.utils;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.res.Configuration;
 import android.content.res.Resources;
+import android.graphics.Point;
 import android.util.DisplayMetrics;
 import android.view.Display;
 import android.view.KeyCharacterMap;
@@ -11,12 +13,19 @@ import android.view.ViewConfiguration;
 
 public class ScreenStuff {
 	
-	private Display display;
-	private DisplayMetrics metrics;
 	private static Resources res;
-	private int height, width;
+	private static int  scrH, scrW;
 	
 
+	public static String getScreenSize(Activity ac){
+		Display display = ac.getWindowManager().getDefaultDisplay();
+		Point size = new Point();
+		display.getSize(size);
+		scrH = size.y;
+		scrW = size.x;
+		return "H: "+scrH+" | W: "+scrW;
+	}
+	
 	public static int getSystemBarHeight2(Context c){
 		res = c.getResources();
 		int resId = res.getIdentifier("navigation_bar_height", "dimen", "android");

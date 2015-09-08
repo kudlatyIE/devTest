@@ -56,10 +56,13 @@ public class LibSrolader {
 //		}
 		
 		// http://stackoverflow.com/questions/6275765/android-how-to-detect-a-directory-in-the-assets-folder
+		String asList="ASSET LIST: \n";
 		try {
+			
 			String [] assetList = a.list("");
 			if(assetList!=null){
 				for(int i=1;i<assetList.length+1;i++){
+					asList=asList+i+"::: asset list::: "+assetList[i-1]+"\n";
 					Log.w("ASSETS", i+"::: asset list::: "+assetList[i-1]);
 				}
 			}
@@ -95,6 +98,7 @@ public class LibSrolader {
 		}catch(Exception e){
 			e.printStackTrace();
 		}
+		temp=temp+"\n"+asList;
 //		temp=temp+"\n"+checkJar();
 		this.result=temp;
 	}

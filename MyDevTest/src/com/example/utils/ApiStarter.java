@@ -9,22 +9,21 @@ import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.content.Context;
 import android.content.Intent;
+import android.util.Log;
 
 public class ApiStarter {
 	private boolean isStart=false;
-	private String msg="NO cam info";
-	private Context context;
-	private Activity activity;
 	private FragmentManager fm;
 	
+	public ApiStarter(){}
+	
 	public ApiStarter(GetResultActivity getResultActivity){
-		this.activity=getResultActivity;
-		this.context = getResultActivity.getApplicationContext();
+		getResultActivity.getApplicationContext();
 		this.fm= getResultActivity.getFragmentManager();
 		System.out.println("API constructor - YES!!");
 	}
 	
-	public boolean startCamInfo() throws Exception{
+	public boolean startForResult() throws Exception{
 //	public String startCamInfo(){
 		Fragment fr = new Fragment(){
 			@Override
@@ -41,6 +40,7 @@ public class ApiStarter {
 					if(resultCode==Activity.RESULT_OK){
 						if(true==data.getBooleanExtra("result",false)) isStart = true;
 						else isStart = false;
+						Log.d("RETURN", "MSG: "+data.getStringExtra("msg"));
 //						if(true==data.getBooleanExtra("result", false)) msg = MsgResult.getResult().getMsg();
 					}
 				}
@@ -49,7 +49,7 @@ public class ApiStarter {
 		FragmentTransaction ft = this.fm.beginTransaction();
 		ft.add(fr, "getUserName");
 		ft.commit();
-		if(isStart) throw new Exception("Buuuuu! Failure!");
+//		if(!isStart) throw new Exception("Buuuuu! Failure!");
 		return isStart;
 //		return msg;
 	}

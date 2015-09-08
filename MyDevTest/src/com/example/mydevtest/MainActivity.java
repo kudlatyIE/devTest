@@ -15,7 +15,7 @@ import android.widget.TextView;
 public class MainActivity extends Activity {
 	
 	private TextView tvMsg, tvScreen, tvNet;
-	private Button btnCheckNet, btnOpenWifi, btnOpenMob, btnCamera, btnJavaView, btnForResult, btnSd;
+	private Button btnCheckNet, btnOpenWifi, btnOpenMob, btnCamera, btnJavaView, btnForResult, btnSd, btnLib;
 	private String dev, screen;
 	private boolean isNet, isWifi=false, isMob=false;
 	private InternetConnection ic;
@@ -37,6 +37,7 @@ public class MainActivity extends Activity {
 		btnOpenWifi.setVisibility(View.GONE);
 		btnOpenMob.setVisibility(View.GONE);
 		btnSd = (Button) findViewById(R.id.btn_sd);
+		btnLib = (Button) findViewById(R.id.btn_check_library);
 		
 		dev = DevDetails.getDeviceName();
 		screen = DevDetails.getDensity(getApplicationContext());
@@ -49,6 +50,7 @@ public class MainActivity extends Activity {
 		btnJavaView.setOnClickListener(button);
 		btnForResult.setOnClickListener(button);
 		btnSd.setOnClickListener(button);
+		btnLib.setOnClickListener(button);
 		
 		
 		tvMsg.setText(dev);
@@ -131,6 +133,11 @@ public class MainActivity extends Activity {
 			case R.id.btn_sd:
 				intent = new Intent(getApplicationContext(),SDActivity.class);
 				startActivity(intent);
+				break;
+			case R.id.btn_check_library:
+				intent = new Intent(getApplicationContext(), NativeLibActivity.class);
+				startActivity(intent);
+				break;
 			}
 			
 		}

@@ -8,5 +8,8 @@
     <string name="title_activity_to_do">ToDoActivity</string>
     <string name="title_activity_get_result">GetResultActivity</string>
     <string name="title_activity_sd">SDActivity</string>
+    <string name="title_activity_native_lib">NativeLibActivity</string>
+    <string name="native_libs">NATIVE LIBS</string>
+    <string name="oszesz_">Oszesz..</string>
 
 </resources>

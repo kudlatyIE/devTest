@@ -29,28 +29,31 @@ public class GetResultActivity extends Activity {
 		tvResult = (TextView) findViewById(R.id.text_result_stuff);
 		tvResult.setText(getResources().getString(R.string.title_activity_get_result));
 //		btnGetResult.setVisibility(View.GONE);
-		
+//		starter= getStarter();
 		
 		
 		btnGetResult.setOnClickListener(new OnClickListener(){
 
 			@Override
 			public void onClick(View v) {
-				 starter= getStarter();
+				starter= getStarter();
 				try {
-					bol = starter.startCamInfo();
-					result = MsgResult.getResult();
-					tvResult.setText(result.isMsg()+" | "+result.getMsg());
-				} catch (Exception e) {
-					tvResult.setText(result.isMsg()+" | "+result.getMsg());
-					e.printStackTrace();
-				}
-				if(bol) tvResult.setText("dupa");
-				else {
+					bol = starter.startForResult();
 //					result = MsgResult.getResult();
 //					tvResult.setText(result.isMsg()+" | "+result.getMsg());
-					System.out.println("GetResult: "+ result.getMsg());
+				} catch (Exception e) {
+//					tvResult.setText(result.isMsg()+" | "+result.getMsg());
+					e.printStackTrace();
+				}finally{
+					result = MsgResult.getResult();
+					tvResult.setText(result.isMsg()+" | "+result.getMsg()+" | "+bol);
 				}
+//				if(bol) tvResult.setText("dupa");
+//				else {
+////					result = MsgResult.getResult();
+////					tvResult.setText(result.isMsg()+" | "+result.getMsg());
+//					System.out.println("GetResult: "+ result.getMsg());
+//				}
 			}
 			
 		});
@@ -65,8 +68,8 @@ public class GetResultActivity extends Activity {
 			tvResult.setText(result.isMsg()+" | "+result.getMsg());
 		
 	}
-	protected void onDestroy(){
-		super.onDestroy();
-		MsgResult.setResult(false, null);
-	}
+//	protected void onDestroy(){
+//		super.onDestroy();
+//		MsgResult.setResult(false, null);
+//	}
 }

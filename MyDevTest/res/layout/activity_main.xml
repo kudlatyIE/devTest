@@ -76,5 +76,11 @@
         android:layout_height="wrap_content"
         android:text="GET SD PATH"
         />
+    <Button 
+        android:id="@+id/btn_check_library"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="CHECK NATIVLIBRARY"
+        />
 
 </LinearLayout>

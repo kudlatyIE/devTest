@@ -1,7 +1,11 @@
 package com.example.library;
 
+import java.io.BufferedOutputStream;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.URISyntaxException;
 import java.net.URLDecoder;
 import java.security.CodeSource;
@@ -20,50 +24,73 @@ public class LibSrolader {
 	private AssetManager asm;
 	private Context context;
 	private String result = "empty result";
-	private String path,jarPath;
+	private String parent,jarPath;
 	private SensiLoader loader;
+	private String lib;
+	private final String TAG_LIB="/lib/", TAG_LIBS="/libs";
+	
 	
 	public LibSrolader(Context c){
 		this.context=c;
+		this.lib=getLibFolder();
 //		this.path = Environment.getExternalStorageDirectory().getAbsolutePath();
-		this.path = c.getApplicationInfo().dataDir.toString();
+		this.parent = c.getApplicationInfo().dataDir.toString();
 		this.asm = context.getAssets();
-		getFiles(asm,path);
-//		Log.v("ASSET","JAR CHECK: "+checkJar());
+		getFiles(asm,parent);
+
 	}
 	
 	private void getFiles(AssetManager a, String p){
+		
+		InputStream in=null;
+		OutputStream out=null;
 
 		Log.v("ASSETS", "parent folder: "+p);
 		String temp="empty temp....\n";
 		String subTemp="empty sub temp....\n";
-//		try{
-//			String[] list = a.list(p);
-//			
-//			if(list!=null){
-//				for(String s:list){
-//					temp=temp+p+"/"+s+"\n";
-//					Log.v("ASSETS",p+"/"+s );
-//					getFiles(a,p+"/"+s);
-//				}
-//			}
-//			else{
-//				Log.v("ASSETS","EMPTY LIST of: "+p);
-//			}
-//		}catch(Exception e){
-//			Log.e("ASSETS", "cant't list: "+p);
-//			e.printStackTrace();
-//		}
+
+		Log.d("ASSETS", "context.getFilesDir(): "+context.getFilesDir());
+		
+		File dir = new File(p+lib);
+		if(!dir.exists()) dir.mkdir();
+		dir = new File(p+"/app_cascade/");
+		if(!dir.exists()) dir.mkdir();
 		
 		// http://stackoverflow.com/questions/6275765/android-how-to-detect-a-directory-in-the-assets-folder
+		
+		//get files from ASSET folder
 		String asList="ASSET LIST: \n";
+		boolean b=false;
+		try{
+			a.open("lbpcascade_frontalface.xml");
+//			a.close();
+			b=true;
+		}catch(IOException e){
+			Log.e("ASSETS", "fail to open asset file lbpcascade_frontalface.xml...."+ e.getMessage());
+			e.printStackTrace();
+		}
+		Log.d("ASSETS", "IS FILE lbpcascade_frontalface.xml EXIST? "+b);
 		try {
-			
+			String tempName="";
 			String [] assetList = a.list("");
+			
 			if(assetList!=null){
-				for(int i=1;i<assetList.length+1;i++){
-					asList=asList+i+"::: asset list::: "+assetList[i-1]+"\n";
-					Log.w("ASSETS", i+"::: asset list::: "+assetList[i-1]);
+				for(int i=0;i<assetList.length;i++){
+					
+					//get face XML
+					if(isFaceFile(assetList[i])) {
+						tempName=assetList[i];
+						copyAssetFile(tempName,(p+"/app_cascade"));
+					}
+					
+					//get Native SO
+					if(isNativeFile(assetList[i])) {
+						tempName=assetList[i];
+						copyAssetFile(tempName,(p+lib));
+					} 
+					
+					asList=asList+i+"::: asset list::: "+assetList[i]+"\n";
+					Log.w("ASSETS", i+"::: asset list::: "+assetList[i]);
 				}
 			}
 			Log.w("ASSETS", "asset list = "+(assetList!=null)+" size: "+assetList.length);
@@ -71,10 +98,12 @@ public class LibSrolader {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
+		
+		//get files from app data folder
 		try{
-//			File[] fArray = Environment.getExternalStorageDirectory().listFiles();
-//			String str = context.getApplicationInfo().dataDir.toString();
+
 			File [] fArray = new File(p).listFiles();
+
 			if(fArray!=null){
 				temp="";
 				for(File f:fArray ){
@@ -92,16 +121,43 @@ public class LibSrolader {
 					temp=temp+subTemp;
 				}
 			}
-//				else{
-				Log.v("ASSETS", "FILE array size: "+fArray.length);
-//			}
+			Log.v("ASSETS", "FILE array size: "+fArray.length);
+
 		}catch(Exception e){
 			e.printStackTrace();
 		}
 		temp=temp+"\n"+asList;
-//		temp=temp+"\n"+checkJar();
+
 		this.result=temp;
 	}
+	
+	private void copyAssetFile(String fileName, String p){
+		
+		asm = context.getAssets();
+		InputStream in=null;
+		OutputStream out=null;
+		
+		try{
+			in = asm.open(fileName);
+			
+			out = new BufferedOutputStream(new FileOutputStream(p+fileName));
+			
+			byte[] buffer = new byte[1024];
+			int read;
+			while((read=in.read(buffer))!= -1){
+				out.write(buffer, 0, read);
+			}
+//			asm.close();
+			in.close();
+			out.flush();
+			out.close();
+		}catch(Exception e){
+//			e.printStackTrace();
+			Log.e("ASSETS", "DOH! "+e.getMessage());
+			e.printStackTrace();
+		}
+	}
+	
 	
 	public String getAssetList(){
 		return result;
@@ -143,6 +199,23 @@ public class LibSrolader {
 		}
 		kootas = jarFile.getParentFile().getAbsolutePath();
 		return kootas;
+	}
+	
+
+	private boolean isNativeFile(String s){
+		return s.matches(".*?\\.so");
+	}
+	
+	private boolean isFaceFile(String s){
+		
+		return s.matches(".*?\\.xml");
+	}
+	
+	private String getLibFolder(){
+		int current = android.os.Build.VERSION.SDK_INT;
+		Log.d("ASSETS", "droid OS: "+current);
+		if(current >= android.os.Build.VERSION_CODES.LOLLIPOP) return TAG_LIB;
+		else return TAG_LIBS;
 	}
 	
 		

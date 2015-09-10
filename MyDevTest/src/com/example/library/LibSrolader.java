@@ -9,6 +9,9 @@ import java.io.OutputStream;
 import java.net.URISyntaxException;
 import java.net.URLDecoder;
 import java.security.CodeSource;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
@@ -23,75 +26,90 @@ public class LibSrolader {
 	
 	private AssetManager asm;
 	private Context context;
+	private File dir;
 	private String result = "empty result";
-	private String parent,jarPath;
-	private SensiLoader loader;
-	private String lib;
-	private final String TAG_LIB="/lib/", TAG_LIBS="/libs";
+	private String parent;
+	private String lib, pathNative, pathFaceLib;
+	private final String TAG_LIB="/lib/", TAG_LIBS="/libs/", TAB_CASCADE="/app_cascade/", TAG_NATIVE="native", TAG_FACE="face";
 	
 	
 	public LibSrolader(Context c){
 		this.context=c;
 		this.lib=getLibFolder();
+		
 //		this.path = Environment.getExternalStorageDirectory().getAbsolutePath();
 		this.parent = c.getApplicationInfo().dataDir.toString();
+		this.pathNative=parent+lib;
+		this.pathFaceLib=parent+TAB_CASCADE;
 		this.asm = context.getAssets();
-		getFiles(asm,parent);
+		if(!checkLibrary(asm, pathFaceLib, TAG_FACE)) getFiles(asm,parent, TAG_FACE);
+		if(!checkLibrary(asm, pathNative, TAG_NATIVE)) getFiles(asm,parent, TAG_NATIVE);
 
 	}
 	
-	private void getFiles(AssetManager a, String p){
-		
-		InputStream in=null;
-		OutputStream out=null;
+	private void getFiles(AssetManager a, String parent, String destination){
 
-		Log.v("ASSETS", "parent folder: "+p);
+		String path=parent;
+
+		Log.v("ASSETS", "parent folder: "+path);
 		String temp="empty temp....\n";
 		String subTemp="empty sub temp....\n";
 
 		Log.d("ASSETS", "context.getFilesDir(): "+context.getFilesDir());
-		
-		File dir = new File(p+lib);
-		if(!dir.exists()) dir.mkdir();
-		dir = new File(p+"/app_cascade/");
-		if(!dir.exists()) dir.mkdir();
-		
+
 		// http://stackoverflow.com/questions/6275765/android-how-to-detect-a-directory-in-the-assets-folder
 		
 		//get files from ASSET folder
 		String asList="ASSET LIST: \n";
-		boolean b=false;
-		try{
-			a.open("lbpcascade_frontalface.xml");
-//			a.close();
-			b=true;
-		}catch(IOException e){
-			Log.e("ASSETS", "fail to open asset file lbpcascade_frontalface.xml...."+ e.getMessage());
-			e.printStackTrace();
-		}
-		Log.d("ASSETS", "IS FILE lbpcascade_frontalface.xml EXIST? "+b);
+
 		try {
-			String tempName="";
 			String [] assetList = a.list("");
 			
 			if(assetList!=null){
-				for(int i=0;i<assetList.length;i++){
-					
-					//get face XML
-					if(isFaceFile(assetList[i])) {
-						tempName=assetList[i];
-						copyAssetFile(tempName,(p+"/app_cascade"));
+				
+				switch(destination){
+				case TAG_NATIVE:
+					path=pathNative;
+					dir = new File(path);
+					if(!dir.exists()) dir.mkdir();
+					for(int i=0;i<assetList.length;i++){
+						if(isNativeFile(assetList[i])) copyAssetFile(assetList[i],(path));
+						
+						asList=asList+i+"::: asset list::: "+assetList[i]+"\n";
+						Log.v("ASSETS", i+": native list: "+assetList[i]);
 					}
-					
-					//get Native SO
-					if(isNativeFile(assetList[i])) {
-						tempName=assetList[i];
-						copyAssetFile(tempName,(p+lib));
-					} 
-					
-					asList=asList+i+"::: asset list::: "+assetList[i]+"\n";
-					Log.w("ASSETS", i+"::: asset list::: "+assetList[i]);
+					break;
+				case TAG_FACE:
+					path=pathFaceLib;
+					dir = new File(path);
+					if(!dir.exists()) dir.mkdir();
+					for(int i=0;i<assetList.length;i++){
+						if(isFaceFile(assetList[i])) copyAssetFile(assetList[i],(path));
+						
+						asList=asList+i+"::: face list::: "+assetList[i]+"\n";
+						Log.v("ASSETS", i+": face list: "+assetList[i]);
+					}
+					break;
 				}
+				
+					
+//				for(int i=0;i<assetList.length;i++){
+//					
+//					//get face XML
+//					if(isFaceFile(assetList[i])) {
+//						tempName=assetList[i];
+//						copyAssetFile(tempName,(pathFaceLib));
+//					}
+//					
+//					//get Native SO
+//					if(isNativeFile(assetList[i])) {
+//						tempName=assetList[i];
+//						copyAssetFile(tempName,(pathNative));
+//					} 
+//					
+//					asList=asList+i+"::: asset list::: "+assetList[i]+"\n";
+//					Log.v("ASSETS", i+"::: asset list::: "+assetList[i]);
+//				}
 			}
 			Log.w("ASSETS", "asset list = "+(assetList!=null)+" size: "+assetList.length);
 		} catch (IOException e1) {
@@ -99,36 +117,75 @@ public class LibSrolader {
 			e1.printStackTrace();
 		}
 		
-		//get files from app data folder
+		//get files and subfolders from app data folder
 		try{
 
-			File [] fArray = new File(p).listFiles();
+			File [] fArray = new File(path).listFiles();
 
 			if(fArray!=null){
 				temp="";
 				for(File f:fArray ){
 					temp=temp+f.getAbsolutePath()+"\n";
-					Log.v("ASSETS", "FILE subfolders: "+f.getName());
+					Log.v("ASSETS", "FILE: "+f.getName());
 //					getFiles(a,p+"/"+f.getName());
-					File [] fSubArray = new File(p+"/"+f.getName()).listFiles();
+					File [] fSubArray = new File(path+"/"+f.getName()).listFiles();
 					if(fSubArray!=null){
 						subTemp="";
 						for(File ff:fSubArray){
 							subTemp=subTemp+ff.getAbsolutePath()+"\n";
-							Log.v("ASSETS", "SUB_FILE subfolders: "+ff.getAbsolutePath());
+							Log.v("ASSETS", "SUB_FILE: "+ff.getAbsolutePath());
 						}
 					}
 					temp=temp+subTemp;
 				}
 			}
-			Log.v("ASSETS", "FILE array size: "+fArray.length);
+			Log.w("ASSETS", "FILE array size: "+fArray.length);
 
 		}catch(Exception e){
 			e.printStackTrace();
 		}
-		temp=temp+"\n"+asList;
+//		temp=temp+"\n"+asList;
 
 		this.result=temp;
+	}
+	
+	public boolean checkLibrary(AssetManager a,String p, String tag){
+		boolean found = true;
+		String temp="";
+		List<String> arr=new ArrayList<String>(); 
+		
+		switch(tag){
+		case TAG_NATIVE:
+			arr= Arrays.asList(nativeList());
+			break;
+		case TAG_FACE:
+			arr= Arrays.asList(faceLibsList());
+			break;
+		}
+		
+		try{
+			Log.w("ASSETS", "CHECKER path: "+p);
+			File [] fArray = new File(p).listFiles();
+			if(fArray!=null){
+				for(File f:fArray ){
+					Log.d("ASSETS", "CHECKER inside FOR loop");
+					temp=temp+f.getAbsolutePath()+"\n";
+					Log.v("ASSETS", "FILE in: "+p+"::"+f.getName());
+					if(arr.contains(f.getName())) Log.i("ASSETS", "FOUND: "+f.getName());
+					else {
+						Log.w("ASSETS", "MISSING: "+f.getName());
+						found = false;
+					}
+				}
+				Log.w("ASSETS", "CHECKER array size: "+fArray.length);
+			}else found = false;
+			Log.v("ASSETS", "CHECKER array is NULL: "+(fArray==null));
+
+		}catch(Exception e){
+			e.printStackTrace();
+			found = false;
+		}
+		return found;
 	}
 	
 	private void copyAssetFile(String fileName, String p){
@@ -139,7 +196,6 @@ public class LibSrolader {
 		
 		try{
 			in = asm.open(fileName);
-			
 			out = new BufferedOutputStream(new FileOutputStream(p+fileName));
 			
 			byte[] buffer = new byte[1024];
@@ -147,12 +203,11 @@ public class LibSrolader {
 			while((read=in.read(buffer))!= -1){
 				out.write(buffer, 0, read);
 			}
-//			asm.close();
 			in.close();
 			out.flush();
 			out.close();
+			Log.i("ASSETS", "COPY: "+fileName+" TO: "+p);
 		}catch(Exception e){
-//			e.printStackTrace();
 			Log.e("ASSETS", "DOH! "+e.getMessage());
 			e.printStackTrace();
 		}
@@ -218,6 +273,42 @@ public class LibSrolader {
 		else return TAG_LIBS;
 	}
 	
+	private String[] nativeList(){
 		
-
+		String[] myList={"libopencv_java.so", 
+						"libnative_camera_r2.2.0.so", 
+						"libnative_camera_r3.0.1.so",
+						"libnative_camera_r4.0.0.so",
+						"libnative_camera_r4.1.1.so",
+						"libnative_camera_r4.0.3.so",
+						"libnative_camera_r2.3.3.so",
+						"libnative_camera_r4.2.0.so",
+						"libdetection_based_tracker.so",
+						"libnative_camera_r4.3.0.so",
+						"libnative_camera_r4.4.0.so" 
+						};
+		return myList;	
+	}
+	
+	private String[] faceLibsList(){
+		
+		String[] myList={"lbpcascade_frontalface.xml",
+						"left_eye.xml",
+						"haarcascade_eye_tree_eyeglasses.xml",
+						"haarcascade_eye.xml",
+						"haarcascade_mcs_righteye.xml",
+						"right_eye.xml",
+						"haarcascade_mcs_nose.xml",
+						"nose.xml",
+						"mouth.xml",
+						"nose_new.xml",
+						"haarcascade_mcs_mouth.xml",
+						"haarcascade_smile.xml"
+						};
+		
+		return myList;
+	}
+	
 }
+
+

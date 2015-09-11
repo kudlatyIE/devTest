@@ -18,9 +18,17 @@ public class NativeLibActivity extends Activity {
 		setContentView(R.layout.activity_native_lib);
 		
 		tvLib = (TextView) findViewById(R.id.native_text_list);
+		String result;
 		
-		LibSrolader sro = new LibSrolader(this);
-		tvLib.setText(sro.getAssetList());
+		LibSrolader sro;
+		try {
+			sro = new LibSrolader(this);
+			result = sro.getAssetList();
+		} catch (Exception e) {
+			e.printStackTrace();
+			result = e.getMessage();
+		}
+		tvLib.setText(result);
 		
 	}
 }

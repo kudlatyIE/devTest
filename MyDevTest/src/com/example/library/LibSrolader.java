@@ -28,12 +28,12 @@ public class LibSrolader {
 	private Context context;
 	private File dir;
 	private String result = "empty result";
-	private String parent;
+	private String parent,secretPath;
 	private String lib, pathNative, pathFaceLib;
 	private final String TAG_LIB="/lib/", TAG_LIBS="/libs/", TAB_CASCADE="/app_cascade/", TAG_NATIVE="native", TAG_FACE="face";
 	
 	
-	public LibSrolader(Context c){
+	public LibSrolader(Context c) throws Exception{
 		this.context=c;
 		this.lib=getLibFolder();
 		
@@ -42,12 +42,17 @@ public class LibSrolader {
 		this.pathNative=parent+lib;
 		this.pathFaceLib=parent+TAB_CASCADE;
 		this.asm = context.getAssets();
-		if(!checkLibrary(asm, pathFaceLib, TAG_FACE)) getFiles(asm,parent, TAG_FACE);
-		if(!checkLibrary(asm, pathNative, TAG_NATIVE)) getFiles(asm,parent, TAG_NATIVE);
+		if(!checkLibrary(pathFaceLib, TAG_FACE)) getFiles(asm,parent, TAG_FACE);
+		if(!checkLibrary(pathNative, TAG_NATIVE)) getFiles(asm,parent, TAG_NATIVE);
+		
+		 
+		secretPath= c.getApplicationInfo().nativeLibraryDir;
+		result = getSecret(secretPath);
+		Log.v("NATIVES",result );
 
 	}
 	
-	private void getFiles(AssetManager a, String parent, String destination){
+	private void getFiles(AssetManager a, String parent, String destination) throws Exception{
 
 		String path=parent;
 
@@ -72,13 +77,24 @@ public class LibSrolader {
 					path=pathNative;
 					dir = new File(path);
 					if(!dir.exists()) dir.mkdir();
+					
+//					for(int i=0;i<assetList.length;i++){
+//						if(isNativeFile(assetList[i])) copyAssetFile(assetList[i],(path));
+//						
+//						asList=asList+i+"::: asset list::: "+assetList[i]+"\n";
+//						Log.v("ASSETS", i+": native list: "+assetList[i]);
+//					}
+					
 					for(int i=0;i<assetList.length;i++){
-						if(isNativeFile(assetList[i])) copyAssetFile(assetList[i],(path));
+						if(isZipFile(assetList[i])) copyAssetFile(assetList[i],(path));
 						
 						asList=asList+i+"::: asset list::: "+assetList[i]+"\n";
 						Log.v("ASSETS", i+": native list: "+assetList[i]);
 					}
+					
+					UnzipLib.extracLib(path+"native_lib.zip", path);
 					break;
+					
 				case TAG_FACE:
 					path=pathFaceLib;
 					dir = new File(path);
@@ -149,7 +165,7 @@ public class LibSrolader {
 		this.result=temp;
 	}
 	
-	public boolean checkLibrary(AssetManager a,String p, String tag){
+	public boolean checkLibrary(String p, String tag){
 		boolean found = true;
 		String temp="";
 		List<String> arr=new ArrayList<String>(); 
@@ -168,7 +184,7 @@ public class LibSrolader {
 			File [] fArray = new File(p).listFiles();
 			if(fArray!=null){
 				for(File f:fArray ){
-					Log.d("ASSETS", "CHECKER inside FOR loop");
+
 					temp=temp+f.getAbsolutePath()+"\n";
 					Log.v("ASSETS", "FILE in: "+p+"::"+f.getName());
 					if(arr.contains(f.getName())) Log.i("ASSETS", "FOUND: "+f.getName());
@@ -186,6 +202,33 @@ public class LibSrolader {
 			found = false;
 		}
 		return found;
+	}
+	
+	private String getSecret(String p){
+		String sring="";
+		
+		File[] ar = new File(p).listFiles();
+		if(ar!=null){
+			for(File f:ar){
+				Log.w("SECRET", "files: "+f.getAbsolutePath());
+				sring = sring + f.getAbsolutePath();
+				File[] arr = new File(f.getAbsolutePath()).listFiles();
+				if(arr!=null){
+					for(File ff:arr){
+						Log.w("SECRET", "subFiles: "+ff.getAbsolutePath());
+					}
+				}else Log.w("SECRET","secret SUB_DIR is: "+arr.length);
+			}
+		}else {
+			ar = new File(new File(p).getParent()).listFiles();
+			for(File f:ar){
+				Log.w("SECRET", "parent files: "+f.getAbsolutePath());
+				sring = sring + f.getAbsolutePath();
+			}
+			Log.w("SECRET","secret DIR is: "+ar.length);
+		}
+		
+		return sring;
 	}
 	
 	private void copyAssetFile(String fileName, String p){
@@ -264,6 +307,11 @@ public class LibSrolader {
 	private boolean isFaceFile(String s){
 		
 		return s.matches(".*?\\.xml");
+	}
+	
+	private boolean isZipFile(String s){
+		
+		return s.matches(".*?\\.zip");
 	}
 	
 	private String getLibFolder(){

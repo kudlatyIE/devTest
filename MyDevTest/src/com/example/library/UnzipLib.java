@@ -1,5 +1,6 @@
 package com.example.library;
 
+
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -12,7 +13,7 @@ import java.util.zip.ZipFile;
 import android.util.Log;
 
 public class UnzipLib {
-	
+
 	/**
 	 * extract ZIP file into extractFolder: for native library .so it's a "/lib/ folder inside app data folder.
 	 * @param zipFile
@@ -26,12 +27,15 @@ public class UnzipLib {
 			int BUFFER = 2048;
 			File file = new File(zipFile);
 			ZipFile zip = new ZipFile(file);
-			String newPath = extractFolder;
+//			String newPath = extractFolder;
 			
-			File dir = new File(newPath);
-			if(!dir.exists()) dir.mkdir();
+			File dir = new File(extractFolder);
+			if(!dir.exists()) {
+				throw new Exception(extractFolder+ "NOT EXIST!");
+//				dir.mkdir();
+			}
 			
-			Enumeration zipFileEntries = zip.entries();
+			Enumeration<? extends ZipEntry> zipFileEntries = zip.entries();
 			
 			while(zipFileEntries.hasMoreElements()){
 				
@@ -39,7 +43,7 @@ public class UnzipLib {
 				String currentEntry = entry.getName();
 				Log.d("UNZIP_LIB", "in ZIP found file: "+currentEntry);
 				
-				File destFile = new File(newPath,currentEntry);
+				File destFile = new File(extractFolder,currentEntry);
 				
 				if(!entry.isDirectory()){
 					input = new BufferedInputStream(zip.getInputStream(entry));
@@ -52,27 +56,29 @@ public class UnzipLib {
 					 
 					 //read and write until last byte is encountered
 					 while((currentByte = input.read(data,0,BUFFER)) != -1) dest.write(data, 0, currentByte);
+					 Log.d("UNZIP_LIB", "file unziped: "+destFile.getAbsolutePath());
 		
 				}
 			}
 			
-			
+			dest.flush();
+			dest.close();
+			input.close();
 		}catch(Exception e){
 			e.printStackTrace();
 			throw new Exception("UNZIP library error: "+e.getMessage());
 		}
-		finally{
-			
-			try {
-				dest.flush();
-				dest.close();
-				input.close();
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			
-		}
+//		finally{
+//			
+//			try {
+//				dest.flush();
+//				dest.close();
+//				input.close();
+//			} catch (IOException e) {
+//				e.printStackTrace();
+//			}
+//			
+//		}
 	}
 
 }

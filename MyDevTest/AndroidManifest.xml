@@ -62,6 +62,10 @@
             android:name=".NativeLibActivity"
             android:label="@string/title_activity_native_lib" >
         </activity>
+        <activity
+            android:name=".SensorsActivity"
+            android:label="@string/title_activity_sensors" >
+        </activity>
     </application>
 
 </manifest>

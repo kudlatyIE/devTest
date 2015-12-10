@@ -15,7 +15,7 @@ import android.widget.TextView;
 public class MainActivity extends Activity {
 	
 	private TextView tvMsg, tvScreen, tvNet;
-	private Button btnCheckNet, btnOpenWifi, btnOpenMob, btnCamera, btnJavaView, btnForResult, btnSd, btnLib;
+	private Button btnCheckNet, btnOpenWifi, btnOpenMob, btnCamera, btnJavaView, btnForResult, btnSd, btnLib,btnSensor;
 	private String dev, screen;
 	private boolean isNet, isWifi=false, isMob=false;
 	private InternetConnection ic;
@@ -38,6 +38,7 @@ public class MainActivity extends Activity {
 		btnOpenMob.setVisibility(View.GONE);
 		btnSd = (Button) findViewById(R.id.btn_sd);
 		btnLib = (Button) findViewById(R.id.btn_check_library);
+		btnSensor = (Button) findViewById(R.id.btn_sensors_start);
 		
 		dev = DevDetails.getDeviceName();
 		screen = DevDetails.getDensity(getApplicationContext());
@@ -51,7 +52,7 @@ public class MainActivity extends Activity {
 		btnForResult.setOnClickListener(button);
 		btnSd.setOnClickListener(button);
 		btnLib.setOnClickListener(button);
-		
+		btnSensor.setOnClickListener(button);
 		
 		tvMsg.setText(dev);
 		tvScreen.setText(screen);
@@ -136,6 +137,10 @@ public class MainActivity extends Activity {
 				break;
 			case R.id.btn_check_library:
 				intent = new Intent(getApplicationContext(), NativeLibActivity.class);
+				startActivity(intent);
+				break;
+			case R.id.btn_sensors_start:
+				intent = new Intent(getApplicationContext(),SensorsActivity.class);
 				startActivity(intent);
 				break;
 			}

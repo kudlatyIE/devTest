@@ -11,5 +11,6 @@
     <string name="title_activity_native_lib">NativeLibActivity</string>
     <string name="native_libs">NATIVE LIBS</string>
     <string name="oszesz_">Oszesz..</string>
+    <string name="title_activity_sensors">SensorsActivity</string>
 
 </resources>

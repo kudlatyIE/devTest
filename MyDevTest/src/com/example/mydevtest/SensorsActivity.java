@@ -34,6 +34,7 @@ public class SensorsActivity extends Activity {
 		sensors.checkLight(tvLight);
 		sensors.checkAcceleration(tvVibration);
 		sensors.checkRotation(tvOther);
+		sensors.checkNoise(tvNoise);
 	}
 	
 	class Buttons implements OnClickListener{

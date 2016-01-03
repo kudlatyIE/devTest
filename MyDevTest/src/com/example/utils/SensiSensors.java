@@ -2,6 +2,8 @@ package com.example.utils;
 
 import java.util.ArrayList;
 
+import com.example.utils.SoundAnalizer.RECORD;
+
 import android.content.Context;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
@@ -13,14 +15,15 @@ import android.widget.TextView;
 public class SensiSensors {
 	
 	private SensorManager seseManager;
-	private Sensor sensorLight, sensorAcc,sensorNoise, sensorRotate;
+	private Sensor sensorLight, sensorAcc, sensorRotate;
 	private Context c;
 	private float light, noise,accX, accY, accZ,rotX, rotY, rotZ;
 	private double mini=0, max=0;
 	private static SensiSensors sensors=null;
-	private ArrayList<Float> lightArr,noiseArr;
+	private ArrayList<Float> lightArr;
 	private ArrayList<Xyz> accArr, rotateArr;
-	private SensorEventListener listenerLight, listenerAcc, listenerRotate, listenerNoise;
+	private SensorEventListener listenerLight, listenerAcc, listenerRotate;
+	private SoundAnalizer sound;
 
 	
 	private TextView tvLight, tvAcc,tvNoise, tvRotate;
@@ -55,7 +58,7 @@ public class SensiSensors {
 			public void onSensorChanged(SensorEvent event) {
 				float x;
 				x=event.values[0];
-				Log.d("LIGHT", "light: "+x);
+//				Log.d("LIGHT", "light: "+x);
 //				miniLight=x; maxLight=x;
 				lightArr.add(Float.valueOf(x));
 				
@@ -120,29 +123,34 @@ public class SensiSensors {
 		if(sensorRotate!=null) seseManager.registerListener(listenerRotate, sensorRotate, SensorManager.SENSOR_DELAY_UI);
 	}
 	
+//	public void checkNoise(TextView display){
+//		this.tvNoise=display;
+//
+//		noiseArr = new ArrayList<Float>();
+//		listenerNoise = new SensorEventListener(){
+//
+//				float x;
+//				@Override
+//				public void onSensorChanged(SensorEvent event) {
+//					// TODO Auto-generated method stub
+//					x=event.values[0];
+//					if(noise < x) noise= x;
+//					tvNoise.setText(String.valueOf(noise));
+//				}
+//				@Override
+//				public void onAccuracyChanged(Sensor sensor, int accuracy) {
+//				}
+//			};
+////		sensorNoise = seseManager.getDefaultSensor(.....)
+//			// there will be my custom sound listener....
+//	}
+	
 	public void checkNoise(TextView display){
 		this.tvNoise=display;
-
-		noiseArr = new ArrayList<Float>();
-		listenerNoise = new SensorEventListener(){
-
-				float x;
-				@Override
-				public void onSensorChanged(SensorEvent event) {
-					// TODO Auto-generated method stub
-					x=event.values[0];
-					if(noise < x) noise= x;
-					tvNoise.setText(String.valueOf(noise));
-				}
-				@Override
-				public void onAccuracyChanged(Sensor sensor, int accuracy) {
-				}
-			};
-//		sensorNoise = seseManager.getDefaultSensor(.....)
-			// there will be my custom sound listener....
+		sound = new SoundAnalizer(tvNoise);
+		sound.getSoundLevel(RECORD.START);
+		
 	}
-	
-
 	
 	
 	
@@ -191,7 +199,7 @@ public class SensiSensors {
 		boolean result=false;
 		try{
 			this.seseManager.unregisterListener(listenerLight, sensorLight);
-			tvLight.setText("average: "+getAverage1D(lightArr));
+			tvLight.setText(getAverage1D("Light", lightArr));
 			result=true;
 			Log.i("SENSOR", "light sensor listener disabled: "+result);
 		}catch(Exception ex){
@@ -200,11 +208,13 @@ public class SensiSensors {
 			result=false;
 		}
 		try{
-			this.seseManager.unregisterListener(listenerNoise, sensorNoise);	
+//			this.seseManager.unregisterListener(listenerNoise, sensorNoise);
+			sound.getSoundLevel(RECORD.STOP);
+			tvNoise.setText(getAverage1D("Noise",SoundAnalizer.noiseList));
 			result=true;
-			Log.i("SENSOR", "noise sensor listener disabled: "+result);
+			Log.i("SENSOR", "audio sensor listener disabled: "+result);
 		}catch(Exception ex){
-			Log.e("SENSOR", "noise sensor listener disabled: "+result);
+			Log.e("SENSOR", "audio sensor listener disabled: "+result);
 			ex.printStackTrace();
 			result=false;
 		}
@@ -222,9 +232,9 @@ public class SensiSensors {
 			this.seseManager.unregisterListener(listenerRotate, sensorRotate);	
 			result=true;
 			tvRotate.setText(getAverage3D(rotateArr));
-			Log.i("SENSOR", "other sensor listener disabled: "+result);
+			Log.i("SENSOR", "rotate sensor listener disabled: "+result);
 		}catch(Exception ex){
-			Log.e("SENSOR", "other sensor listener disabled: "+result);
+			Log.e("SENSOR", "rotate sensor listener disabled: "+result);
 			ex.printStackTrace();
 			result=false;
 		}
@@ -233,7 +243,7 @@ public class SensiSensors {
 		return result;
 	}
 	
-	private String getAverage1D(ArrayList<Float> list){
+	public String getAverage1D(String name, ArrayList<Float> list){
 		double total=0;
 		mini=list.get(0);
 		max=list.get(0);
@@ -242,9 +252,9 @@ public class SensiSensors {
 			if(mini > d) mini = d;
 			if(max < d) max= d;
 		}
-		Log.d("SENSOR", "ARR Light total: "+total);
-		Log.d("SENSOR", "ARR Light size: "+list.size());
-		return total/list.size()+"\n MINI: "+mini+", MAX: "+max;
+		Log.d("SENSOR", "ARR "+name+" total: "+total);
+		Log.d("SENSOR", "ARR "+name+" size: "+list.size());
+		return "average: "+total/list.size()+"\n MINI: "+mini+", MAX: "+max;
 	}
 	
 	private String getAverage3D(ArrayList<Xyz> list){

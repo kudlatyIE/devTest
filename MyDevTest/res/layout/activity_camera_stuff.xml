@@ -33,8 +33,16 @@
     <ListView 
         android:id="@+id/list_cameras"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         ></ListView>
+    
+    <Button 
+        android:id="@+id/camera_btn_twincamera"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textColor="#000000"
+        android:text="TWIN CAMERA!"
+        />
     
     
 

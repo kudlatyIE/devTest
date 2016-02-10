@@ -7,14 +7,17 @@ import com.example.utils.ScreenStuff;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.hardware.Camera;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -23,6 +26,7 @@ public class CameraStuffActivity extends Activity {
 	private ArrayList<CameraStuff> camList;
 	private CameraStuff camStuff;
 	private TextView tvCamId, tvSensorH, tvSensorW, tvBarH, tvScreenSize;
+	private Button btnTwin;
 	private ListView lv;
 	private String cameraName;
 	private int barH;
@@ -40,6 +44,7 @@ public class CameraStuffActivity extends Activity {
 		tvScreenSize = (TextView) findViewById(R.id.camera_text_screen_info);
 		tvBarH=(TextView) findViewById(R.id.camera_system_bar_height);
 		lv = (ListView) findViewById(R.id.list_cameras);
+		btnTwin = (Button) findViewById(R.id.camera_btn_twincamera);
 		
 		tvScreenSize.setText("Screen Size: "+ScreenStuff.getScreenSize(this));
 		tvBarH.setText("System Bar Height: "+barH);
@@ -49,10 +54,20 @@ public class CameraStuffActivity extends Activity {
 		lv.setAdapter(adapter);
 		
 		
+		btnTwin.setOnClickListener(new OnClickListener(){
+
+			@Override
+			public void onClick(View v) {
+				// TODO Auto-generated method stub
+				Intent intent = new Intent(CameraStuffActivity.this, TwinCameraActivity.class);
+				startActivity(intent);
+			}
+			
+		});
+		
 	}//end onCreate
 	
 	class MyAdapter  extends BaseAdapter{
-		private Camera camera;
 		private ArrayList<CameraStuff> myList;
 		private LayoutInflater inflater;
 		

@@ -35,5 +35,6 @@
         	android:text="Hello girls!" />
         
     </LinearLayout>
+    
 
 </LinearLayout>

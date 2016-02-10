@@ -1,5 +1,8 @@
 package com.example.mydevtest;
 
+import com.example.serwisy.SensorServiceConnection;
+import com.example.serwisy.ServiceListener;
+import com.example.serwisy.ServiceManager;
 import com.example.utils.SensiSensors;
 
 import android.app.Activity;
@@ -16,6 +19,11 @@ public class SensorsActivity extends Activity {
 	private TextView tvLight,tvNoise,tvVibration,tvOther;
 	private Button btnStop;
 	private SensiSensors sensors;
+	private boolean serviceStarted = false;
+	private SensorServiceConnection mConnection;
+	private ServiceListener mCallback;
+	private ServiceManager mManager;
+	
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -27,6 +35,9 @@ public class SensorsActivity extends Activity {
 		tvVibration = (TextView) findViewById(R.id.sensnor_text_winrations);
 		tvOther = (TextView) findViewById(R.id.sensnor_text_other);
 		btnStop = (Button) findViewById(R.id.sensors_btn_stop);
+		
+		//TODO: finish service with sensor listener.....
+//		serviceStarted = mManager.
 		
 		Buttons button = new Buttons();
 		btnStop.setOnClickListener(button);

@@ -207,37 +207,37 @@ public class SensiSensors {
 			ex.printStackTrace();
 			result=false;
 		}
-		try{
-//			this.seseManager.unregisterListener(listenerNoise, sensorNoise);
-			sound.getSoundLevel(RECORD.STOP);
-			tvNoise.setText(getAverage1D("Noise",SoundAnalizer.noiseList));
-			result=true;
-			Log.i("SENSOR", "audio sensor listener disabled: "+result);
-		}catch(Exception ex){
-			Log.e("SENSOR", "audio sensor listener disabled: "+result);
-			ex.printStackTrace();
-			result=false;
-		}
-		try{
-			this.seseManager.unregisterListener(listenerAcc, sensorAcc);	
-			result=true;
-			tvAcc.setText(getAverage3D(accArr));
-			Log.i("SENSOR", "vibration sensor listener disabled: "+result);
-		}catch(Exception ex){
-			Log.e("SENSOR", "vibration sensor listener disabled: "+result);
-			ex.printStackTrace();
-			result=false;
-		}
-		try{
-			this.seseManager.unregisterListener(listenerRotate, sensorRotate);	
-			result=true;
-			tvRotate.setText(getAverage3D(rotateArr));
-			Log.i("SENSOR", "rotate sensor listener disabled: "+result);
-		}catch(Exception ex){
-			Log.e("SENSOR", "rotate sensor listener disabled: "+result);
-			ex.printStackTrace();
-			result=false;
-		}
+//		try{
+////			this.seseManager.unregisterListener(listenerNoise, sensorNoise);
+//			sound.getSoundLevel(RECORD.STOP);
+//			tvNoise.setText(getAverage1D("Noise",SoundAnalizer.noiseList));
+//			result=true;
+//			Log.i("SENSOR", "audio sensor listener disabled: "+result);
+//		}catch(Exception ex){
+//			Log.e("SENSOR", "audio sensor listener disabled: "+result);
+//			ex.printStackTrace();
+//			result=false;
+//		}
+//		try{
+//			this.seseManager.unregisterListener(listenerAcc, sensorAcc);	
+//			result=true;
+//			tvAcc.setText(getAverage3D(accArr));
+//			Log.i("SENSOR", "vibration sensor listener disabled: "+result);
+//		}catch(Exception ex){
+//			Log.e("SENSOR", "vibration sensor listener disabled: "+result);
+//			ex.printStackTrace();
+//			result=false;
+//		}
+//		try{
+//			this.seseManager.unregisterListener(listenerRotate, sensorRotate);	
+//			result=true;
+//			tvRotate.setText(getAverage3D(rotateArr));
+//			Log.i("SENSOR", "rotate sensor listener disabled: "+result);
+//		}catch(Exception ex){
+//			Log.e("SENSOR", "rotate sensor listener disabled: "+result);
+//			ex.printStackTrace();
+//			result=false;
+//		}
 		
 		
 		return result;

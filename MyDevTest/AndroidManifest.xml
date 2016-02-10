@@ -19,7 +19,7 @@
     <uses-permission android:name="android.permission.CHANGE_NETWORK_STATE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAG" />
     <uses-permission android:name="android.permission.INTERACT_ACROSS_USERS_FULL" />
-    <uses-permission android:name="android.permission.RECORD_AUDIO"/>
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
     <uses-permission android:name="com.sony.mobile.permission.SYSTEM_UI_VISIBILITY_EXTENSION" />
 
     <uses-feature
@@ -67,6 +67,10 @@
         <activity
             android:name=".SensorsActivity"
             android:label="@string/title_activity_sensors" >
+        </activity>
+        <activity
+            android:name=".TwinCameraActivity"
+            android:label="@string/title_activity_twin_camera" >
         </activity>
     </application>
 

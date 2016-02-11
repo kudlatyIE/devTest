@@ -13,5 +13,6 @@
     <string name="oszesz_">Oszesz..</string>
     <string name="title_activity_sensors">SensorsActivity</string>
     <string name="title_activity_twin_camera">TwinCameraActivity</string>
+    <string name="title_activity_vision_face_tracker">VisionFaceTrackerActivity</string>
 
 </resources>

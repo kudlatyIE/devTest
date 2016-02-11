@@ -43,6 +43,7 @@ public class SensorsActivity extends Activity {
 		btnStop.setOnClickListener(button);
 		sensors = new SensiSensors(this);
 		sensors.checkLight(tvLight);
+		
 		sensors.checkAcceleration(tvVibration);
 		sensors.checkRotation(tvOther);
 		sensors.checkNoise(tvNoise);

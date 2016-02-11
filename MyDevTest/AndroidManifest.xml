@@ -72,6 +72,10 @@
             android:name=".TwinCameraActivity"
             android:label="@string/title_activity_twin_camera" >
         </activity>
+        <activity
+            android:name=".VisionFaceTrackerActivity"
+            android:label="@string/title_activity_vision_face_tracker" >
+        </activity>
     </application>
 
 </manifest>

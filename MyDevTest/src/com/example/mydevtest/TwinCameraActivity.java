@@ -1,6 +1,7 @@
 package com.example.mydevtest;
 
 import com.example.dualcamera.CameraPreview;
+import com.example.dualcamera.FaceDetectListener;
 
 import android.app.Activity;
 import android.hardware.Camera;
@@ -27,10 +28,15 @@ public class TwinCameraActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_twin_camera);
 		
+		frontView = (FrameLayout) findViewById(R.id.camera_front_preview);
+		rearView = (FrameLayout) findViewById(R.id.camera_rear_preview);
+		
 //		cRear = CameraPreview.getCamera(CameraInfo.CAMERA_FACING_BACK);
 		cFront = CameraPreview.getCamera(front);
 		cRear = CameraPreview.getCamera(back);
 		
+		cFront.setFaceDetectionListener(new FaceDetectListener(this,frontView ));
+	
 		
 		CameraPreview.lumos(cFront, 3);
 		CameraPreview.setPortrait(this, cFront, front);
@@ -39,10 +45,7 @@ public class TwinCameraActivity extends Activity {
 		
 		previewFront = new CameraPreview(this, cFront);
 		previewRear = new CameraPreview(this, cRear);
-		
-		frontView = (FrameLayout) findViewById(R.id.camera_front_preview);
-		rearView = (FrameLayout) findViewById(R.id.camera_rear_preview);
-		
+
 		
 		tvInfo = (TextView) findViewById(R.id.camera_preview_txt_info);
 		tvInfo.setVisibility(View.GONE);
@@ -60,7 +63,7 @@ public class TwinCameraActivity extends Activity {
 			rearView.addView(previewRear);
 		}else{
 			//just disable back surface view
-			rearView.setVisibility(View.GONE);
+//			rearView.setVisibility(View.GONE);
 			info = info+"Rear Camera NULL ";
 			tvInfo.setVisibility(View.VISIBLE);
 			tvInfo.setText(info);

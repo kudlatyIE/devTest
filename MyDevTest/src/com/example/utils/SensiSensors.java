@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 import com.example.utils.SoundAnalizer.RECORD;
 
+import android.app.Activity;
 import android.content.Context;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
@@ -24,12 +25,15 @@ public class SensiSensors {
 	private ArrayList<Xyz> accArr, rotateArr;
 	private SensorEventListener listenerLight, listenerAcc, listenerRotate;
 	private SoundAnalizer sound;
+	private Activity ac;
 
 	
 	private TextView tvLight, tvAcc,tvNoise, tvRotate;
 	
-	public SensiSensors(Context context){
-		this.c=context;
+//	public SensiSensors(Context context){
+	public SensiSensors(Activity activity){
+		this.ac=activity;
+		this.c=activity.getApplicationContext();
 		this.seseManager = (SensorManager) c.getSystemService(Context.SENSOR_SERVICE);
 		for(Sensor sese: seseManager.getSensorList(Sensor.TYPE_ALL)){
 			Log.i("SENSORS", sese.getName()+" STATUS: "+sese.getPower());
@@ -145,9 +149,10 @@ public class SensiSensors {
 //			// there will be my custom sound listener....
 //	}
 	
+	//TODO: this will be works as independent service....
 	public void checkNoise(TextView display){
 		this.tvNoise=display;
-		sound = new SoundAnalizer(tvNoise);
+		sound = new SoundAnalizer(ac,tvNoise);
 		sound.getSoundLevel(RECORD.START);
 		
 	}
@@ -207,37 +212,46 @@ public class SensiSensors {
 			ex.printStackTrace();
 			result=false;
 		}
-//		try{
-////			this.seseManager.unregisterListener(listenerNoise, sensorNoise);
-//			sound.getSoundLevel(RECORD.STOP);
-//			tvNoise.setText(getAverage1D("Noise",SoundAnalizer.noiseList));
-//			result=true;
-//			Log.i("SENSOR", "audio sensor listener disabled: "+result);
-//		}catch(Exception ex){
-//			Log.e("SENSOR", "audio sensor listener disabled: "+result);
-//			ex.printStackTrace();
-//			result=false;
-//		}
-//		try{
-//			this.seseManager.unregisterListener(listenerAcc, sensorAcc);	
-//			result=true;
-//			tvAcc.setText(getAverage3D(accArr));
-//			Log.i("SENSOR", "vibration sensor listener disabled: "+result);
-//		}catch(Exception ex){
-//			Log.e("SENSOR", "vibration sensor listener disabled: "+result);
-//			ex.printStackTrace();
-//			result=false;
-//		}
-//		try{
-//			this.seseManager.unregisterListener(listenerRotate, sensorRotate);	
-//			result=true;
-//			tvRotate.setText(getAverage3D(rotateArr));
-//			Log.i("SENSOR", "rotate sensor listener disabled: "+result);
-//		}catch(Exception ex){
-//			Log.e("SENSOR", "rotate sensor listener disabled: "+result);
-//			ex.printStackTrace();
-//			result=false;
-//		}
+		try{
+//			this.seseManager.unregisterListener(listenerNoise, sensorNoise);
+			sound.getSoundLevel(RECORD.STOP);
+			tvNoise.setText(getAverage1D("Noise",SoundAnalizer.noiseList));
+//			ac.runOnUiThread(new Runnable(){
+//
+//				@Override
+//				public void run() {
+//					tvNoise.setText(getAverage1D("Noise",SoundAnalizer.noiseList));
+//				}
+//			});
+			
+			result=true;
+			
+			Log.i("SENSOR", "audio sensor listener disabled: "+result);
+		}catch(Exception ex){
+			Log.e("SENSOR", "audio sensor listener disabled: "+result);
+			ex.printStackTrace();
+			result=false;
+		}
+		try{
+			this.seseManager.unregisterListener(listenerAcc, sensorAcc);	
+			result=true;
+			tvAcc.setText(getAverage3D(accArr));
+			Log.i("SENSOR", "vibration sensor listener disabled: "+result);
+		}catch(Exception ex){
+			Log.e("SENSOR", "vibration sensor listener disabled: "+result);
+			ex.printStackTrace();
+			result=false;
+		}
+		try{
+			this.seseManager.unregisterListener(listenerRotate, sensorRotate);	
+			result=true;
+			tvRotate.setText(getAverage3D(rotateArr));
+			Log.i("SENSOR", "rotate sensor listener disabled: "+result);
+		}catch(Exception ex){
+			Log.e("SENSOR", "rotate sensor listener disabled: "+result);
+			ex.printStackTrace();
+			result=false;
+		}
 		
 		
 		return result;
@@ -254,6 +268,7 @@ public class SensiSensors {
 		}
 		Log.d("SENSOR", "ARR "+name+" total: "+total);
 		Log.d("SENSOR", "ARR "+name+" size: "+list.size());
+		Log.d("SENSOR", "ARR "+name+" average: "+total/list.size()+"\n MINI: "+mini+", MAX: "+max);
 		return "average: "+total/list.size()+"\n MINI: "+mini+", MAX: "+max;
 	}
 	

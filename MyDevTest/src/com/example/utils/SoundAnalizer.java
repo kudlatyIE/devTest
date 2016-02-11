@@ -2,6 +2,7 @@ package com.example.utils;
 
 import java.util.ArrayList;
 
+import android.app.Activity;
 import android.content.Context;
 import android.media.AudioFormat;
 import android.media.AudioRecord;
@@ -14,18 +15,21 @@ public class SoundAnalizer {
 	
 	private MediaRecorder mRecord;
 	private AudioRecord audio;
-	private Context c;
+//	private Context c;
 	private static final int SAMPLE_RATE = 8000, SAMPLE_DELAY=75;
 	private static int [] mSamplesRate = new int[] {8000, 11025, 22050, 44100};
 	private int bufferSize;
 	private double lastLevel;
 	private Thread thread;
+	private Runnable ui;
 	public enum RECORD {START,STOP};
 	private String result="doopa";
 	private TextView tvNoise;
 	public static ArrayList<Float> noiseList;
+	private Activity ac;
 	
-	public SoundAnalizer(TextView tv){
+	public SoundAnalizer(Activity activity, TextView tv){
+		this.ac=activity;
 //		this.c=context;
 		this.tvNoise=tv;
 //		this.bufferSize = AudioRecord.getMinBufferSize(SAMPLE_RATE, AudioFormat.CHANNEL_IN_MONO, AudioFormat.ENCODING_PCM_16BIT);
@@ -49,13 +53,26 @@ public class SoundAnalizer {
 						while (thread!=null && !thread.isInterrupted()){
 							try{
 								Thread.sleep(SAMPLE_DELAY);
+
 							}catch(Exception e){
 								e.printStackTrace();
 							}
 							noiseList.add(getLevel(audio));
-//							result = String.valueOf(getLevel(audio));
-//							Log.d("AUDIO", "SOUND CAPTURED: "+result);
-//							tvNoise.setText(result);
+							try{
+								ac.runOnUiThread(ui= new Runnable(){
+
+									@Override
+									public void run() {
+										result = String.valueOf(getLevel(audio));
+//										Log.d("AUDIO", "SOUND CAPTURED: "+result);
+										tvNoise.setText(result);
+									}
+								});
+							}catch(Exception ex){
+								Log.w("SENSOR", "ui runnable is interupted: "+ex.getMessage());
+								tvNoise.removeCallbacks(ui);
+							}
+							
 						}
 					}
 					
@@ -65,14 +82,17 @@ public class SoundAnalizer {
 				break;
 			case STOP:
 				try{
-					tvNoise.setText(result);
+					tvNoise.removeCallbacks(null);
+//					tvNoise.setText(result);
+//					tvNoise.notify();
 					Log.d("AUDIO", "AUDIO THREAD INTERUPTED !");
-					thread.interrupt();
+					if(thread!=null && thread.isAlive()) thread.interrupt();
 					thread=null;
 					audio.stop();
 					audio.release();
+					
 				}catch(Exception ex){
-					ex.printStackTrace();
+					Log.w("SENSORS", ex.getMessage());
 				}
 				break;
 			}
@@ -112,8 +132,8 @@ public class SoundAnalizer {
 							if(ar.getState() == AudioRecord.STATE_INITIALIZED) {
 								Log.v("AUDIO", "AudioRecord INITIALIZED! "+ar.getState());
 								Log.v("AUDIO", "Found rate: "+rate+" Hz"+ ", Format: "+af+ ", chanell: "+ach);
-//								result = String.valueOf(getLevel(ar));
-//								Log.d("AUDIO", "SOUND CAPTURED: "+result);
+								result = String.valueOf(getLevel(ar));
+								Log.d("AUDIO", "SOUND CAPTURED: "+result);
 								return ar;
 							}else{
 								Log.v("AUDIO", "AudioRecord UNINITIALIZED! "+ar.getState());

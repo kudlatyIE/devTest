@@ -50,6 +50,7 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
 		try {
 			mCamera.setPreviewDisplay(holder);
 			mCamera.startPreview();
+			startFaceDetection(mCamera);
 			
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
@@ -94,7 +95,7 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
 		c.setParameters(param);
 	}
 	/**
-	 * set area for metering and focusing
+	 * set area for metering and focusing, may be not supported by your front camera!!!
 	 * @param c Camera
 	 */
 	@SuppressWarnings("deprecation")
@@ -152,6 +153,13 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
 		}
 		c.setDisplayOrientation(result);
 		
+	}
+	
+	private void startFaceDetection(Camera c){
+		Camera.Parameters param = c.getParameters();
+		if(param.getMaxNumDetectedFaces()>0) c.startFaceDetection();
+		else Log.e(TAG, c.toString()+" do not support face detection!");
+			//throw new Exception(c.toString()+" do not support face detection!");
 	}
 	
 	

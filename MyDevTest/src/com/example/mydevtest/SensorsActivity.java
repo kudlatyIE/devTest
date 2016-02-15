@@ -3,6 +3,7 @@ package com.example.mydevtest;
 import com.example.serwisy.SensorServiceConnection;
 import com.example.serwisy.ServiceListener;
 import com.example.serwisy.ServiceManager;
+import com.example.utils.ButtonFactory;
 import com.example.utils.SensiSensors;
 
 import android.app.Activity;
@@ -23,18 +24,20 @@ public class SensorsActivity extends Activity {
 	private SensorServiceConnection mConnection;
 	private ServiceListener mCallback;
 	private ServiceManager mManager;
+	private ButtonFactory btn;
 	
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_sensors);
-		
+		btn = new ButtonFactory();
 		tvLight = (TextView) findViewById(R.id.sensnor_text_light);
 		tvNoise = (TextView) findViewById(R.id.sensnor_text_noise);
 		tvVibration = (TextView) findViewById(R.id.sensnor_text_winrations);
 		tvOther = (TextView) findViewById(R.id.sensnor_text_other);
 		btnStop = (Button) findViewById(R.id.sensors_btn_stop);
+		btn.addBtn(R.id.sensors_btn_stop, "sensors_btn_stop");
 		
 		//TODO: finish service with sensor listener.....
 //		serviceStarted = mManager.
@@ -53,11 +56,14 @@ public class SensorsActivity extends Activity {
 
 		@Override
 		public void onClick(View v) {
-			switch(v.getId()){
-			case R.id.sensors_btn_stop:
+			if(btn.getBtnId(R.id.sensors_btn_stop)==v.getId()){
 				if(sensors!=null) sensors.disableSensorManager();
-				break;
 			}
+//			switch(v.getId()){
+//			case R.id.sensors_btn_stop:
+//				if(sensors!=null) sensors.disableSensorManager();
+//				break;
+//			}
 		}
 		
 	}

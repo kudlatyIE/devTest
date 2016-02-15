@@ -26,7 +26,7 @@ public class CameraStuffActivity extends Activity {
 	private ArrayList<CameraStuff> camList;
 	private CameraStuff camStuff;
 	private TextView tvCamId, tvSensorH, tvSensorW, tvBarH, tvScreenSize;
-	private Button btnTwin;
+	private Button btnTwin, btnFaceVision;
 	private ListView lv;
 	private String cameraName;
 	private int barH;
@@ -45,6 +45,7 @@ public class CameraStuffActivity extends Activity {
 		tvBarH=(TextView) findViewById(R.id.camera_system_bar_height);
 		lv = (ListView) findViewById(R.id.list_cameras);
 		btnTwin = (Button) findViewById(R.id.camera_btn_twincamera);
+		btnFaceVision = (Button) findViewById(R.id.camera_btn_facevision);
 		
 		tvScreenSize.setText("Screen Size: "+ScreenStuff.getScreenSize(this));
 		tvBarH.setText("System Bar Height: "+barH);
@@ -60,6 +61,16 @@ public class CameraStuffActivity extends Activity {
 			public void onClick(View v) {
 				// TODO Auto-generated method stub
 				Intent intent = new Intent(CameraStuffActivity.this, TwinCameraActivity.class);
+				startActivity(intent);
+			}
+			
+		});
+		btnFaceVision.setOnClickListener(new OnClickListener(){
+
+			@Override
+			public void onClick(View v) {
+				// TODO Auto-generated method stub
+				Intent intent = new Intent(CameraStuffActivity.this, VisionFaceTrackerActivity.class);
 				startActivity(intent);
 			}
 			

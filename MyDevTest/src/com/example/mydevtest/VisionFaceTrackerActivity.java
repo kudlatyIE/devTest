@@ -1,32 +1,37 @@
 package com.example.mydevtest;
 
+import java.io.IOException;
+
 import com.example.visionface.CameraSourcePreview;
 import com.example.visionface.FaceMarkers;
 import com.example.visionface.GraphicOverlay;
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.gms.vision.CameraSource;
-import com.google.android.gms.vision.Detector.Detections;
 import com.google.android.gms.vision.MultiProcessor;
 import com.google.android.gms.vision.Tracker;
 import com.google.android.gms.vision.face.Face;
 import com.google.android.gms.vision.face.FaceDetector;
 
 import android.Manifest;
+import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.Dialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
-import android.support.v4.content.ContextCompat;
 import android.support.v4.app.ActivityCompat;
+import android.support.v7.app.AppCompatActivity;
 import android.support.design.widget.Snackbar;
 import android.util.Log;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.TextView;
 
-public class VisionFaceTrackerActivity extends Activity {
+public class VisionFaceTrackerActivity extends AppCompatActivity {
 	
 	private final static String TAG = VisionFaceTrackerActivity.class.getSimpleName();
 	private final static int RC_HANDLE_GSM = 9001, RC_HANDLE_CAMERA_PERM = 2;//camera permission request code must be less than 256!
@@ -72,11 +77,12 @@ public class VisionFaceTrackerActivity extends Activity {
 		Snackbar.make(overlay, R.string.permission_camera_rationale, Snackbar.LENGTH_INDEFINITE).setAction(R.string.ok, listener).show(); 
 	}
 	
-	To be continue:
-	https://github.com/googlesamples/android-vision/blob/master/visionSamples/FaceTracker/app/src/main/java/com/google/android/gms/samples/vision/face/facetracker/FaceTrackerActivity.java
+//	To be continue:
+//	https://github.com/googlesamples/android-vision/blob/master/visionSamples/FaceTracker/app/src/main/java/com/google/android/gms/samples/vision/face/facetracker/FaceTrackerActivity.java
 			
+	@TargetApi(23)
 	@Override
-	public void onRequestPermissionResult(int requestCode, String[] permissions, int[] grantedResults){
+	public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantedResults) {
 		if(requestCode!=RC_HANDLE_CAMERA_PERM){
 			Log.d(TAG, "Got unexpected permission result: "+requestCode);
 			super.onRequestPermissionsResult(requestCode, permissions, grantedResults);
@@ -104,14 +110,15 @@ public class VisionFaceTrackerActivity extends Activity {
 		builder.setPositiveButton(R.string.ok, listener);
 		builder.show();
 	}
+
 	
 	
-	@SuppressWarnings({ "rawtypes", "unchecked" })
 	private void createCameraSource(){
 		
-		FaceDetector detector = new FaceDetector.Builder(this).setClassificationType(FaceDetector.ALL_CLASSIFICATIONS).build();
+		Context context = getApplicationContext();
+		FaceDetector detector = new FaceDetector.Builder(context).setClassificationType(FaceDetector.ALL_CLASSIFICATIONS).build();
 		
-		detector.setProcessor(new MultiProcessor.Builder(new GraphicFaceTrackerFactory()).build());
+		detector.setProcessor(new MultiProcessor.Builder<>(new GraphicFaceTrackerFactory()).build());
 		
 		if(!detector.isOperational()){
 			Log.w(TAG, "Face detector dependenicies are not yet avaliable!");
@@ -141,6 +148,23 @@ public class VisionFaceTrackerActivity extends Activity {
 		}
 	}
 	
+	private void startCameraSource(){
+		
+		int code = GoogleApiAvailability.getInstance().isGooglePlayServicesAvailable(this);
+		if(code!=ConnectionResult.SUCCESS){
+			Dialog dlg = GoogleApiAvailability.getInstance().getErrorDialog(this, code, RC_HANDLE_GSM);
+			dlg.show();
+		}
+		if(cameraSource!=null){
+			try {
+				cameraPreview.start(cameraSource, overlay);
+			} catch (IOException e) {
+				Log.e(TAG, "unable to start camera source: "+e.getMessage());
+				cameraSource.release();
+				cameraSource=null;
+			}
+		}
+	}
 	
 	
 	

@@ -1,5 +1,6 @@
 package com.example.mydevtest;
 
+import com.example.utils.ButtonFactory;
 import com.example.utils.MsgResult;
 
 import android.app.Activity;
@@ -18,6 +19,8 @@ public class ToDoActivity extends Activity {
 	
 	private Button btnDoit, btnDont;
 	private MsgResult result;
+	private ButtonFactory btn;
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -25,7 +28,9 @@ public class ToDoActivity extends Activity {
 		
 	
 		btnDoit = (Button) findViewById(R.id.btn_return_stuff1);
+		btn.addBtn(R.id.btn_return_stuff1, "btn_return_stuff1");
 		btnDont = (Button) findViewById(R.id.btn_return_stuff2);
+		btn.addBtn(R.id.btn_return_stuff2, "btn_return_stuff2");
 		
 		Buttony btn = new Buttony();
 		
@@ -38,26 +43,35 @@ public class ToDoActivity extends Activity {
 		 Intent intent;
 			@Override
 			public void onClick(View v) {
-				switch(v.getId()){
-				case R.id.btn_return_stuff1:
+				
+				if(btn.getBtnId(R.id.btn_return_stuff1)==v.getId()){
 					MsgResult.setResult(true, "Well done Nick!");
-//					result = MsgResult.getResult();
-//					intent = new Intent();
-//					intent.putExtra("result", true);
-//					setResult(11,intent);
-//					finish();
 					returnIntent(ToDoActivity.this,"result",true,Activity.RESULT_OK,"my true return");
-					break;
-				case R.id.btn_return_stuff2:
-					MsgResult.setResult(false, "Straszna koopa Nick!");
-//					result = MsgResult.getResult();
-//					intent = new Intent();
-//					intent.putExtra("result", false);
-//					setResult(11,intent);
-//					finish();
-					returnIntent(ToDoActivity.this,"result",false,Activity.RESULT_OK,"my false return");
-					break;
 				}
+				if(btn.getBtnId(R.id.btn_return_stuff2)==v.getId()){
+					MsgResult.setResult(false, "Straszna koopa Nick!");
+					returnIntent(ToDoActivity.this,"result",false,Activity.RESULT_OK,"my false return");
+				}
+//				switch(v.getId()){
+//				case R.id.btn_return_stuff1:
+//					MsgResult.setResult(true, "Well done Nick!");
+////					result = MsgResult.getResult();
+////					intent = new Intent();
+////					intent.putExtra("result", true);
+////					setResult(11,intent);
+////					finish();
+//					returnIntent(ToDoActivity.this,"result",true,Activity.RESULT_OK,"my true return");
+//					break;
+//				case R.id.btn_return_stuff2:
+//					MsgResult.setResult(false, "Straszna koopa Nick!");
+////					result = MsgResult.getResult();
+////					intent = new Intent();
+////					intent.putExtra("result", false);
+////					setResult(11,intent);
+////					finish();
+//					returnIntent(ToDoActivity.this,"result",false,Activity.RESULT_OK,"my false return");
+//					break;
+//				}
 				
 			}
 			

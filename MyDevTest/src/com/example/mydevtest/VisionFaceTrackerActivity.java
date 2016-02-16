@@ -2,6 +2,8 @@ package com.example.mydevtest;
 
 import java.io.IOException;
 
+import com.example.utils.CameraStuff;
+import com.example.utils.Xyz;
 import com.example.visionface.CameraSourcePreview;
 import com.example.visionface.FaceMarkers;
 import com.example.visionface.GraphicOverlay;
@@ -21,12 +23,14 @@ import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.pm.PackageManager;
+import android.graphics.Point;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.design.widget.Snackbar;
 import android.util.Log;
+import android.view.Display;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.TextView;
@@ -39,16 +43,33 @@ public class VisionFaceTrackerActivity extends AppCompatActivity {
 	private CameraSourcePreview cameraPreview;
 	private GraphicOverlay overlay;
 	private TextView tvInfo;
+	private int width, height;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_vision_face_tracker);
 		
+//		CameraStuff cam = new CameraStuff(this);
+//		Xyz xy = cam.getFrontCamXy();
+//		if(xy!=null){
+//			this.width=xy.getWidth(); this.height=xy.getHeight();
+//			Log.d(TAG, "width: "+width+" height: "+height);
+//		}else {
+//			this.width=480; this.height=640;
+//		}
+		
+		//set properly display size;
+		Display display = getWindowManager().getDefaultDisplay();
+		Point size = new Point();
+		display.getSize(size);
+		width = size.x; height = size.y;
+		
 		cameraPreview = (CameraSourcePreview) findViewById(R.id.visionface_preview);
 		overlay = (GraphicOverlay) findViewById(R.id.visionface_overlay);
 		tvInfo = (TextView) findViewById(R.id.visionface_text_info);
 		
+		tvInfo.setVisibility(View.GONE);
 		int rc = ActivityCompat.checkSelfPermission(this, Manifest.permission.CAMERA);
 		if(rc==PackageManager.PERMISSION_GRANTED){
 			createCameraSource();
@@ -116,15 +137,20 @@ public class VisionFaceTrackerActivity extends AppCompatActivity {
 	private void createCameraSource(){
 		
 		Context context = getApplicationContext();
-		FaceDetector detector = new FaceDetector.Builder(context).setClassificationType(FaceDetector.ALL_CLASSIFICATIONS).build();
+		FaceDetector detector = new FaceDetector.Builder(context)
+							.setProminentFaceOnly(true)
+							.setTrackingEnabled(true)
+							.setMinFaceSize(0.35f)
+							.setClassificationType(FaceDetector.ALL_CLASSIFICATIONS).build();
 		
 		detector.setProcessor(new MultiProcessor.Builder<>(new GraphicFaceTrackerFactory()).build());
 		
 		if(!detector.isOperational()){
 			Log.w(TAG, "Face detector dependenicies are not yet avaliable!");
 		}
-		cameraSource = new CameraSource.Builder(this, detector).setRequestedPreviewSize(640, 480)
+		cameraSource = new CameraSource.Builder(this, detector).setRequestedPreviewSize(width, height)
 						.setFacing(CameraSource.CAMERA_FACING_FRONT).setRequestedFps(30f).build();
+		
 	}
 	
 	@Override

@@ -16,6 +16,7 @@ public class CameraStuff {
 	private int camNumber, CameraId, height, width;
 	private String cameraName, sensorInfo;
 	private ArrayList<CameraStuff> myList;
+	public Xyz xy;
 	
 	public CameraStuff(Context context){
 		this.context=context;
@@ -58,7 +59,8 @@ public class CameraStuff {
 		return list;
 	}
 	
-	private Camera getFrontCam(){
+//	private Camera getFrontCam(){
+	public Xyz getFrontCamXy(){
 		Camera c=null;
 		CameraInfo ci=null;
 		int w=0,h=0;
@@ -68,7 +70,11 @@ public class CameraStuff {
 			if(ci.facing==CameraInfo.CAMERA_FACING_FRONT){
 				w=c.getParameters().getPictureSize().width;
 				h=c.getParameters().getPictureSize().height;
-				return c;
+				this.xy = new Xyz(w,h);
+				c.release();
+				c=null;
+				return xy;
+//				return c;
 			}
 		}catch(Exception ex){
 			System.out.println("No front camera!");

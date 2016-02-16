@@ -6,8 +6,10 @@ import java.util.Set;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.View;
 
+import com.example.utils.Xyz;
 import com.google.android.gms.vision.CameraSource;
 
 public class GraphicOverlay extends View{
@@ -22,9 +24,11 @@ public class GraphicOverlay extends View{
 	
 	public static abstract class Graphic{
 		private GraphicOverlay mOverlay;
+//		private int offX;
 		
 		public Graphic(GraphicOverlay overlay){
 			this.mOverlay=overlay;
+//			this.offX=x;
 		}
 		public abstract void draw(Canvas canvas);
 		
@@ -41,10 +45,22 @@ public class GraphicOverlay extends View{
 		}
 		
 		public float translateX(float x){
-			if(mOverlay.mFacing == CameraSource.CAMERA_FACING_FRONT){
-				return mOverlay.getWidth() - scaleX(x);
-			}
+//			if(mOverlay.mFacing == CameraSource.CAMERA_FACING_FRONT){
+//				return mOverlay.getWidth() - scaleX(x);
+//			}
+			//return mirror view
 			return scaleX(x);
+		}
+		
+		public float translateMirrorX(float x){
+			float frog = mOverlay.getWidth() - x;
+//			Log.i("TRANSLATE_X", "X: "+x+ "mX: "+frog);
+			return frog;
+		}
+		public float translateMirrorY(float y){
+			float frog = mOverlay.getHeight() - y;
+//			Log.i("TRANSLATE_Y", "Y: "+y+ "mY: "+frog);
+			return frog;
 		}
 		
 		public void postInvalidate(){
@@ -93,8 +109,8 @@ public class GraphicOverlay extends View{
 		super.onDraw(canvas);
 		synchronized(mLock){
 			if((mPreviewWidth!=0) &&(mPreviewHeight!=0)){
-				widthScaleFactor = canvas.getWidth()/mPreviewWidth;// may be need to cast to float?
-				heightScaleFactor = canvas.getHeight()/mPreviewHeight;
+				widthScaleFactor = canvas.getWidth();// /mPreviewWidth;// may be need to cast to float?
+				heightScaleFactor = canvas.getHeight();// /mPreviewHeight;
 			}
 			for(Graphic g: mGraphic) g.draw(canvas);
 		}

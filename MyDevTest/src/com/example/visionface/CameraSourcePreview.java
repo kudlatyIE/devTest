@@ -5,12 +5,15 @@ import java.io.IOException;
 import com.google.android.gms.common.images.Size;
 import com.google.android.gms.vision.CameraSource;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.res.Configuration;
+import android.graphics.Point;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.SurfaceHolder;
 import android.view.SurfaceHolder.Callback;
+import android.view.Display;
 import android.view.SurfaceView;
 import android.view.ViewGroup;
 
@@ -21,15 +24,17 @@ public class CameraSourcePreview extends ViewGroup{
 	private SurfaceView mSurfaceView;
 	private boolean mStartRequested, mSurfaceAvailable;
 	private CameraSource mCameraSource;
-	
+	private Activity ac;
 	private GraphicOverlay mOverlay;
 
 	public CameraSourcePreview(Context context, AttributeSet attrs) {
 		super(context, attrs);
 		this.mContext=context;
+//		this.ac=activity;
 		this.mStartRequested=false;
 		this.mSurfaceAvailable=false;
 		this.mSurfaceView = new SurfaceView(context);
+		
 		this.mSurfaceView.getHolder().addCallback(new SurfaceCallback());
 		addView(this.mSurfaceView);
 		
@@ -37,8 +42,11 @@ public class CameraSourcePreview extends ViewGroup{
 
 	@Override
 	protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
-		int width = 320, height = 240;
+		int width = 240, height = 320;
+		
+		//TODO: set dimension of real screen!!!!
 		if(this.mCameraSource!=null){
+			
 			Size size = this.mCameraSource.getPreviewSize();
 			if(size!=null){
 				width = size.getWidth();
@@ -119,10 +127,21 @@ public class CameraSourcePreview extends ViewGroup{
 		if(this.mStartRequested && this.mSurfaceAvailable){
 			this.mCameraSource.start(this.mSurfaceView.getHolder());
 			if(mOverlay!=null){
-				Size size = mCameraSource.getPreviewSize();
+				
+				//TODO: set real size of screen here??????.......
+//				Display display = ac.getWindowManager().getDefaultDisplay();
+//				Point scrSize = new Point();
+//				display.getSize(scrSize);
+//				int width = scrSize.x; int height = scrSize.y;
 				int mini, max;
+//				mini = Math.min(width, height);
+//				max = Math.max(width, height);
+				
+				Size size = mCameraSource.getPreviewSize();
+				
 				mini = Math.min(size.getWidth(), size.getHeight());
 				max = Math.max(size.getWidth(), size.getHeight());
+				
 				if(isPortraitMode()) mOverlay.setCameraInfo(mini, max, mCameraSource.getCameraFacing());
 				else mOverlay.setCameraInfo(max, mini, mCameraSource.getCameraFacing());
 				mOverlay.clear();

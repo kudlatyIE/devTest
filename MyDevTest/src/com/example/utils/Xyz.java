@@ -2,11 +2,33 @@ package com.example.utils;
 
 public class Xyz {
 	private float x,y,z;
+	private int w,h;
 	
 	public Xyz(float x, float y, float z){
 		this.x=x;
 		this.y=y;
 		this.z=z;
+	}
+	
+	public Xyz(int w, int h){
+		this.w=w;
+		this.h=h;
+	}
+
+	public int getWidth() {
+		return w;
+	}
+
+	public int getHeight() {
+		return h;
+	}
+
+	public void setW(int w) {
+		this.w = w;
+	}
+
+	public void setH(int h) {
+		this.h = h;
 	}
 
 	public float getX() {

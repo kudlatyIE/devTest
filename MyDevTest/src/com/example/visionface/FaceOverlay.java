@@ -6,31 +6,30 @@ import java.util.Set;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.View;
 
-import com.example.utils.Xyz;
+import com.example.visionface.GraphicOverlay.Graphic;
 import com.google.android.gms.vision.CameraSource;
 
-public class GraphicOverlay extends View{
-	
+public class FaceOverlay extends View{
+
 	private final Object mLock = new Object();
 	private int mPreviewWidth, mPreviewHeight;
 	private float widthScaleFactor = 1f,heightScaleFactor=1f;
 	
 	private int mFacing = CameraSource.CAMERA_FACING_FRONT; // try if front camera support face detect!
 	
-	private Set<Graphic> mGraphic = new HashSet<Graphic>();
+	private Set<Overlay> mGraphic = new HashSet<Overlay>();
 	
-	public static abstract class Graphic{
-		private GraphicOverlay mOverlay;
+	public static abstract class Overlay{
+		private FaceOverlay mOverlay;
 //		private int offX;
 		
-		public Graphic(GraphicOverlay overlay){
+		public Overlay(FaceOverlay overlay){
 			this.mOverlay=overlay;
 //			this.offX=x;
 		}
-		public abstract void draw(Canvas canvas);
+//		public abstract void draw(Canvas canvas);
 		
 		public float scaleX(float horizontal){
 			return horizontal*mOverlay.widthScaleFactor;
@@ -55,7 +54,6 @@ public class GraphicOverlay extends View{
 		public float translateMirrorX(float x){
 			float frog = mOverlay.getWidth() - x;
 //			Log.i("TRANSLATE_X", "X: "+x+ "mX: "+frog);
-
 			return frog;
 		}
 		public float translateMirrorY(float y){
@@ -64,36 +62,36 @@ public class GraphicOverlay extends View{
 			return frog;
 		}
 		
-		public void postInvalidate(){
-			mOverlay.postInvalidate();
-		}
+//		public void postInvalidate(){
+//			mOverlay.postInvalidate();
+//		}
 		
 	}
 	
-	public GraphicOverlay(Context context, AttributeSet attribs){
+	public FaceOverlay(Context context, AttributeSet attribs){
 		super(context,attribs);
 	}
-	
-	public void clear(){
-		synchronized(mLock){
-			mGraphic.clear();
-		}
-		postInvalidate();
-	}
-	
-	public void add(Graphic graphic){
-		synchronized(mLock){
-			mGraphic.add(graphic);
-		}
-		postInvalidate();
-	}
-	
-	public void remove(Graphic graphic){
-		synchronized(mLock){
-			mGraphic.remove(graphic);
-		}
-		postInvalidate();
-	}
+//	
+//	public void clear(){
+//		synchronized(mLock){
+//			mGraphic.clear();
+//		}
+//		postInvalidate();
+//	}
+//	
+//	public void add(Overlay graphic){
+//		synchronized(mLock){
+//			mGraphic.add(graphic);
+//		}
+//		postInvalidate();
+//	}
+//	
+//	public void remove(Overlay graphic){
+//		synchronized(mLock){
+//			mGraphic.remove(graphic);
+//		}
+//		postInvalidate();
+//	}
 
 	
 	public void setCameraInfo(int previewWidth, int previewHeight, int facing){
@@ -104,17 +102,4 @@ public class GraphicOverlay extends View{
 		}
 		postInvalidate();
 	}
-	
-	@Override
-	protected void onDraw(Canvas canvas){
-		super.onDraw(canvas);
-		synchronized(mLock){
-			if((mPreviewWidth!=0) &&(mPreviewHeight!=0)){
-				widthScaleFactor = canvas.getWidth();// /mPreviewWidth;// may be need to cast to float?
-				heightScaleFactor = canvas.getHeight();// /mPreviewHeight;
-			}
-			for(Graphic g: mGraphic) g.draw(canvas);
-		}
-	}
-	
 }

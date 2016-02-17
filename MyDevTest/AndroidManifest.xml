@@ -79,7 +79,7 @@
         </activity>
         <activity
             android:name=".VisionFaceTrackerActivity"
-            android:label="@string/title_activity_vision_face_tracker" >
+            android:label="Nju Wiżyn Aktiwiti" >
         </activity>
     </application>
 

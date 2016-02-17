@@ -6,6 +6,8 @@ import com.example.utils.CameraStuff;
 import com.example.utils.Xyz;
 import com.example.visionface.CameraSourcePreview;
 import com.example.visionface.FaceMarkers;
+import com.example.visionface.FaceOverlay;
+import com.example.visionface.FaceVisionUtils;
 import com.example.visionface.GraphicOverlay;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
@@ -50,14 +52,7 @@ public class VisionFaceTrackerActivity extends AppCompatActivity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_vision_face_tracker);
 		
-//		CameraStuff cam = new CameraStuff(this);
-//		Xyz xy = cam.getFrontCamXy();
-//		if(xy!=null){
-//			this.width=xy.getWidth(); this.height=xy.getHeight();
-//			Log.d(TAG, "width: "+width+" height: "+height);
-//		}else {
-//			this.width=480; this.height=640;
-//		}
+
 		
 		//set properly display size;
 		Display display = getWindowManager().getDefaultDisplay();
@@ -141,7 +136,8 @@ public class VisionFaceTrackerActivity extends AppCompatActivity {
 							.setProminentFaceOnly(true)
 							.setTrackingEnabled(true)
 							.setMinFaceSize(0.35f)
-							.setClassificationType(FaceDetector.ALL_CLASSIFICATIONS).build();
+							.setClassificationType(FaceDetector.ALL_CLASSIFICATIONS)
+							.setMode(FaceDetector.ACCURATE_MODE).build();
 		
 		detector.setProcessor(new MultiProcessor.Builder<>(new GraphicFaceTrackerFactory()).build());
 		
@@ -192,7 +188,20 @@ public class VisionFaceTrackerActivity extends AppCompatActivity {
 		}
 	}
 	
+	private class SensiFaceTracker implements MultiProcessor.Factory<Face>{
+
+		@Override
+		public Tracker<Face> create(Face arg0) {
+			return null;
+		}
+		
+	}
 	
+	private class BioExctractor extends Tracker<Face>{
+		
+		private FaceVisionUtils mFaceUtils;
+		private FaceOverlay mOverlay;
+	}
 	
 	private class GraphicFaceTrackerFactory implements MultiProcessor.Factory<Face>{
 

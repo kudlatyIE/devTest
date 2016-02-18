@@ -14,14 +14,14 @@ import android.util.Log;
 public class FaceVisionUtils {
 	
 	private static Xyz xy;
-	private final static float eulerYMax=10f, eulerZMax=5f, smileChange=0.3f;
+	private final static float eulerYMax=10f, eulerZMax=5f, smileChange=0.4f;
 //	public final static String EYE_L="eye_left", EYE_R="eye_right",NOSE_BASE="nose_base", MOUTH_CENTER="mouth_center";
 	public final static Integer EYE_L = Landmark.LEFT_EYE, EYE_R=Landmark.RIGHT_EYE,
 							MOUTH_L = Landmark.LEFT_MOUTH, MOUTH_R = Landmark.RIGHT_MOUTH,
 							MOUTH_B = Landmark.BOTTOM_MOUTH, NOSE = Landmark.NOSE_BASE;
 	
 	private static List<Float> smileList;
-	private static float startSmile, endSmile, topSmile;
+	private static float startSmile=0, endSmile, topSmile=0;
 	private static Bitmap btm;
 	private static HashMap<Integer, PointF> bioScore;
 	
@@ -29,20 +29,20 @@ public class FaceVisionUtils {
 	 * return default screen size 480x640(width, height) if real size unknown
 	 * @return
 	 */
-	public static Xyz getXy() {
-		if(xy==null) return new Xyz(480, 640);
-		return xy;
-	}
-	public static void setXy(Xyz xy) {
-		FaceVisionUtils.xy = xy;
-	}
-
-	public static List<Float> getSmile() {
-		return smileList;
-	}
-	public static void setSmile(List<Float> smile) {
-		FaceVisionUtils.smileList = smile;
-	}
+//	public static Xyz getXy() {
+//		if(xy==null) return new Xyz(480, 640);
+//		return xy;
+//	}
+//	public static void setXy(Xyz xy) {
+//		FaceVisionUtils.xy = xy;
+//	}
+//
+//	public static List<Float> getSmile() {
+//		return smileList;
+//	}
+//	public static void setSmile(List<Float> smile) {
+//		FaceVisionUtils.smileList = smile;
+//	}
 	
 	/**
 	 * add new smile value (s) and update a highest value
@@ -65,9 +65,10 @@ public class FaceVisionUtils {
 	 */
 	public static boolean isMakeSmile(){
 		if(startSmile == 0f) return false;
-		if(smileList == null) return false;
+		if(smileList.size()==0) return false;
 //		float end = smileList.get(smileList.size()-1);
-		return isSmile(startSmile, topSmile);
+//		return isSmile(startSmile, topSmile);
+		return(smileChange< Math.abs(startSmile-topSmile));
 	}
 	
 	public static void createLandmark(int landmark, PointF value){
@@ -88,8 +89,8 @@ public class FaceVisionUtils {
 		}
 	}
 	
-	private static boolean isSmile(float smileStart, float smileNow){
-		if(smileChange < Math.abs(smileNow-smileStart)) return false;
+	private static boolean isSmile(float s1, float s2){
+		if(smileChange > Math.abs(s1-s2)) return false;
 		return true;
 	}
 	

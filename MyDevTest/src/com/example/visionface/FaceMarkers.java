@@ -12,6 +12,7 @@ import android.graphics.Paint;
 import android.graphics.PointF;
 import android.media.FaceDetector;
 import android.util.Log;
+import android.widget.Toast;
 
 public class FaceMarkers extends GraphicOverlay.Graphic{
 	
@@ -24,10 +25,14 @@ public class FaceMarkers extends GraphicOverlay.Graphic{
 	private int mFaceId;
 	private float mFaceHappiness;
 	private List<Landmark> landmark;
+	private static boolean gotSmile = false;
+	
+	private SmileEvent smileEvent;
 	
 
-	public FaceMarkers(GraphicOverlay overlay) {
+	public FaceMarkers(SmileEvent smile, GraphicOverlay overlay) {
 		super(overlay);
+		this.smileEvent=smile;
 		colorIndex = (colorIndex + 1) % COLORS.length;
 		final int selectedColor = COLORS[colorIndex];
 		
@@ -54,6 +59,8 @@ public class FaceMarkers extends GraphicOverlay.Graphic{
         center.setStyle(Paint.Style.STROKE);
 	}
 	
+	
+	
 	public void setId(int id){
 		this.mFaceId=id;
 	}
@@ -67,9 +74,19 @@ public class FaceMarkers extends GraphicOverlay.Graphic{
 	@Override
 	public void draw(Canvas canvas) {
 		Face face = mFace;
+		smileEvent.smiling(false);//callback
 		if(face==null) return;
 		
 		float smile, eulerY, eulerZ;
+		smile = face.getIsSmilingProbability();
+		eulerY = face.getEulerY();
+		eulerZ = face.getEulerZ();
+		
+		FaceVisionUtils.addSmile(smile);
+		if(FaceVisionUtils.isMakeSmile()) {
+			Log.v(TAG, "That was a smile, yeah!!!!!");
+			smileEvent.smiling(true);//smile callback - time to take a picture! TEST ONLY!
+		}
 		
 		//mark landmarks
 		for(Landmark mark: face.getLandmarks()){
@@ -90,11 +107,11 @@ public class FaceMarkers extends GraphicOverlay.Graphic{
 		x = 0; y = 0;
 //		canvas.drawCircle(x, y, FACE_POSITION_RADIUS, mFacePositionPaint);
 //		canvas.drawText("ID: "+mFaceId, x+ID_X_OFFSET, y + ID_Y_OFFSET, mIdPaint);
-		canvas.drawText("smile: "+String.format("%.2f", face.getIsSmilingProbability()), x+ID_X_OFFSET, y + ID_Y_OFFSET, mIdPaint);
+		canvas.drawText("smile: "+String.format("%.2f", smile), x+ID_X_OFFSET, y + ID_Y_OFFSET, mIdPaint);
 		canvas.drawText("R eye: "+String.format("%.2f", face.getIsRightEyeOpenProbability()),x+ID_X_OFFSET, y + ID_Y_OFFSET*2, mIdPaint);
 		canvas.drawText("L eye: "+String.format("%.2f", face.getIsLeftEyeOpenProbability()), x+ID_X_OFFSET, y + ID_Y_OFFSET*3, mIdPaint);
-		canvas.drawText("Y angle: "+String.format("%.2f", face.getEulerY()), x+ID_X_OFFSET, y + ID_Y_OFFSET*4, mIdPaint);
-		canvas.drawText("Z angle: "+String.format("%.2f", face.getEulerZ()), x+ID_X_OFFSET, y + ID_Y_OFFSET*5, mIdPaint);
+		canvas.drawText("Y angle: "+String.format("%.2f", eulerY), x+ID_X_OFFSET, y + ID_Y_OFFSET*4, mIdPaint);
+		canvas.drawText("Z angle: "+String.format("%.2f", eulerZ), x+ID_X_OFFSET, y + ID_Y_OFFSET*5, mIdPaint);
 		
 		PointF o = face.getPosition();//top left position!
 		

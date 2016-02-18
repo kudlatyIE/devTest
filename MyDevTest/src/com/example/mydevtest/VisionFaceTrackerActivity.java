@@ -9,6 +9,7 @@ import com.example.visionface.FaceMarkers;
 import com.example.visionface.FaceOverlay;
 import com.example.visionface.FaceVisionUtils;
 import com.example.visionface.GraphicOverlay;
+import com.example.visionface.SmileEvent;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.gms.vision.CameraSource;
@@ -36,8 +37,9 @@ import android.view.Display;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.TextView;
+import android.widget.Toast;
 
-public class VisionFaceTrackerActivity extends AppCompatActivity {
+public class VisionFaceTrackerActivity extends AppCompatActivity implements SmileEvent{
 	
 	private final static String TAG = VisionFaceTrackerActivity.class.getSimpleName();
 	private final static int RC_HANDLE_GSM = 9001, RC_HANDLE_CAMERA_PERM = 2;//camera permission request code must be less than 256!
@@ -218,7 +220,7 @@ public class VisionFaceTrackerActivity extends AppCompatActivity {
 		
 		GraphicFaceTracker(GraphicOverlay overlay){
 			this.mOverlay = overlay;
-			this.mGraphic = new FaceMarkers(overlay);
+			this.mGraphic = new FaceMarkers(VisionFaceTrackerActivity.this, overlay);
 		}
 
 		@Override
@@ -243,5 +245,14 @@ public class VisionFaceTrackerActivity extends AppCompatActivity {
 		}
 		
 		
+	}
+
+	@Override
+	public void smiling(boolean isSmaile) {
+		// TODO Auto-generated method stub
+		if(isSmaile) {  //create bitmap from camera source, release camera source and finish activity
+			Toast.makeText(getApplicationContext(), "it is smiling!", Toast.LENGTH_SHORT).show();
+			finish();
+		}
 	}
 }

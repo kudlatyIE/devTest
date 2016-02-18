@@ -17,6 +17,7 @@ public class GraphicOverlay extends View{
 	private final Object mLock = new Object();
 	private int mPreviewWidth, mPreviewHeight;
 	private float widthScaleFactor = 1f,heightScaleFactor=1f;
+	private CameraSource source;// need pass camera source to take a picture
 	
 	private int mFacing = CameraSource.CAMERA_FACING_FRONT; // try if front camera support face detect!
 	

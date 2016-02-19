@@ -2,43 +2,64 @@ package com.example.visionface;
 
 import java.io.IOException;
 
+import com.example.visionface.FaceInterfaces.PicDone;
+import com.example.visionface.FaceInterfaces.SavePicture;
+import com.example.visionface.FaceInterfaces.SmileEvent;
 import com.google.android.gms.common.images.Size;
 import com.google.android.gms.vision.CameraSource;
+import com.google.android.gms.vision.CameraSource.PictureCallback;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.res.Configuration;
-import android.graphics.Point;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.SurfaceHolder;
-import android.view.SurfaceHolder.Callback;
-import android.view.Display;
 import android.view.SurfaceView;
 import android.view.ViewGroup;
 
-public class CameraSourcePreview extends ViewGroup{
+public class CameraSourcePreview extends ViewGroup {
 	
 	private static final String TAG = CameraSourcePreview.class.getSimpleName();
 	private Context mContext;
 	private SurfaceView mSurfaceView;
 	private boolean mStartRequested, mSurfaceAvailable;
 	private CameraSource mCameraSource;
-	private Activity ac;
 	private GraphicOverlay mOverlay;
+//	private SavePicture save;
+	private PicDone picDone;
+
 
 	public CameraSourcePreview(Context context, AttributeSet attrs) {
 		super(context, attrs);
+		
 		this.mContext=context;
-//		this.ac=activity;
 		this.mStartRequested=false;
 		this.mSurfaceAvailable=false;
 		this.mSurfaceView = new SurfaceView(context);
-		
 		this.mSurfaceView.getHolder().addCallback(new SurfaceCallback());
 		addView(this.mSurfaceView);
-		
 	}
+
+	public void setSave(final PicDone done) {
+		this.picDone=done;
+//		this.save = save;
+		if(mCameraSource!=null){
+			Log.w(TAG, "try to save in camerasource preview");
+			mCameraSource.takePicture(null, new CameraSource.PictureCallback() {
+				
+				@Override
+				public void onPictureTaken(byte[] arg0) {
+					Log.d(TAG, "picture callback!");
+					if(arg0!=null) Log.d(TAG, "picture callback - byte[] size: "+arg0.length);
+					else Log.d(TAG, "picture callback - byte[] is NULL!");
+					FaceVisionUtils.setByteFace(arg0);
+					done.isSaved(true);
+					
+				}} );
+			
+		}else Log.w(TAG, "takePicture(): camera source is null");
+	}
+
 
 	@Override
 	protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
@@ -152,7 +173,7 @@ public class CameraSourcePreview extends ViewGroup{
 	
 
 	
-	private class SurfaceCallback implements SurfaceHolder.Callback{
+	private class SurfaceCallback implements SurfaceHolder.Callback{ //TODO implement call to save surface view here!
 
 		@Override
 		public void surfaceCreated(SurfaceHolder holder) {
@@ -176,6 +197,115 @@ public class CameraSourcePreview extends ViewGroup{
 		}
 		
 	}
+	
+
+//	private PictureCallback pictureCallback = new CameraSource.PictureCallback() {
+//		
+//		@Override
+//		public void onPictureTaken(byte[] arg0) {
+//			if(arg0==null){
+//				Log.d(TAG, "picture callback - byte[] is NULL: "+(arg0==null));
+//			}else{
+//				Log.d(TAG, "picture callback!");
+//				Log.d(TAG, "picture callback - byte[] size: "+arg0.length);
+////				new SavePic().execute(arg0);
+//				FaceVisionUtils.setByteFace(arg0);
+//				savePic.isSaved(true);
+//			}
+//			
+//		}
+//	};
+
+//	@Override
+//	public void isSaved(boolean status) {
+//		// TODO Auto-generated method stub
+//		
+//	}
+//
+//	@Override
+//	public void saveIt(boolean readyToDo) {
+//		if(readyToDo){
+//			if(mCameraSource!=null){
+//				try{
+//					mCameraSource.start(mSurfaceView.getHolder());
+//					mCameraSource.takePicture(null,pictureCallback );
+//				}catch(RuntimeException | IOException ex){
+//					Log.e(TAG, "take pic: "+ex.getMessage());
+//					ex.printStackTrace();
+//				}finally{
+//					Log.d(TAG, "bye, bye from saveIt");
+//				}
+//			}else Log.w(TAG, "takePicture(): camera source is null");
+//		}
+//		
+//	}
+
+
+
+//	@Override
+//	public void smiling(boolean isSmile) {
+//		// TODO Auto-generated method stub
+//				if(isSmile) {  //create bitmap from camera source, release camera source and finish activity
+////					Toast.makeText(getApplicationContext(), "it is smiling!", Toast.LENGTH_SHORT).show();
+//					Log.d(TAG, "is smiling!");
+//					try {
+//						mCameraSource.start(mSurfaceView.getHolder());
+//					} catch (IOException e) {
+//						// TODO Auto-generated catch block
+//						e.printStackTrace();
+//					}
+//					if(mCameraSource!=null){
+//						mCameraSource.takePicture(null, new CameraSource.PictureCallback() {
+//							
+//							@Override
+//							public void onPictureTaken(byte[] arg0) {
+//								Log.d(TAG, "picture callback!");
+//								if(arg0!=null) Log.d(TAG, "picture callback - byte[] size: "+arg0.length);
+//								else Log.d(TAG, "picture callback - byte[] is NULL!");
+//								FaceVisionUtils.setByteFace(arg0);
+//								savePic.isSaved(true);
+//								
+//							}} );
+//					}else Log.w(TAG, "takePicture(): camera source is null");
+//					mCameraSource.release();
+//					mCameraSource=null;
+//					
+//				}
+//		
+//	}
+
+//	@Override
+//	public void saveIt(boolean readyToDo) {
+//
+//		if(readyToDo) {  //create bitmap from camera source, release camera source and finish activity
+////			Toast.makeText(getApplicationContext(), "it is smiling!", Toast.LENGTH_SHORT).show();
+//			Log.d(TAG, "is smiling!");
+//			try {
+//				mCameraSource.start();
+//			} catch (IOException e) {
+//				// TODO Auto-generated catch block
+//				e.printStackTrace();
+//			}
+//			if(mCameraSource!=null){
+//				mCameraSource.takePicture(null, new CameraSource.PictureCallback() {
+//					
+//					@Override
+//					public void onPictureTaken(byte[] arg0) {
+//						Log.d(TAG, "picture callback!");
+//						if(arg0!=null) Log.d(TAG, "picture callback - byte[] size: "+arg0.length);
+//						else Log.d(TAG, "picture callback - byte[] is NULL!");
+//						FaceVisionUtils.setByteFace(arg0);
+//						done.isSaved(true);
+//						
+//					}} );
+//				
+//			}else Log.w(TAG, "takePicture(): camera source is null");
+//			mCameraSource.release();
+//			mCameraSource=null;
+//			
+//		}
+//	
+//	}
 	
 	
 	

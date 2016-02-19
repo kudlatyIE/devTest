@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 import com.example.utils.CameraStuff;
 import com.example.utils.ScreenStuff;
+import com.example.visionface.FaceVisionUtils;
 
 import android.app.Activity;
 import android.content.Context;
@@ -70,6 +71,7 @@ public class CameraStuffActivity extends Activity {
 			@Override
 			public void onClick(View v) {
 				// TODO Auto-generated method stub
+				FaceVisionUtils.resetSmile();
 				Intent intent = new Intent(CameraStuffActivity.this, VisionFaceTrackerActivity.class);
 				startActivity(intent);
 			}

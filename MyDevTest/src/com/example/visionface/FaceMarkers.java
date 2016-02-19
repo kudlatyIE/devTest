@@ -2,6 +2,10 @@ package com.example.visionface;
 
 import java.util.List;
 
+import com.example.mydevtest.VisionFaceTrackerActivity;
+import com.example.visionface.FaceInterfaces.PicDone;
+import com.example.visionface.FaceInterfaces.SmileEvent;
+import com.google.android.gms.vision.CameraSource;
 import com.google.android.gms.vision.face.Face;
 import com.google.android.gms.vision.face.Landmark;
 
@@ -16,7 +20,7 @@ import android.widget.Toast;
 
 public class FaceMarkers extends GraphicOverlay.Graphic{
 	
-	private final static String TAG = "FACE";
+	private final static String TAG = FaceMarkers.class.getSimpleName();
 	private final static float FACE_POSITION_RADIUS = 10f, ID_TEXT_SIZE= 30f, ID_X_OFFSET=20f, ID_Y_OFFSET=50f, BOX_STROKE = 5f;
 	private final static int [] COLORS = {Color.RED, Color.BLUE, Color.CYAN, Color.MAGENTA, Color.WHITE, Color.YELLOW};
 	private static int colorIndex = 0;
@@ -26,13 +30,17 @@ public class FaceMarkers extends GraphicOverlay.Graphic{
 	private float mFaceHappiness;
 	private List<Landmark> landmark;
 	private static boolean gotSmile = false;
-	
+	private static int smileNum = 0;
+	private CameraSource mCameraSource;
 	private SmileEvent smileEvent;
+	private PicDone done;
 	
 
-	public FaceMarkers(SmileEvent smile, GraphicOverlay overlay) {
+	public FaceMarkers(CameraSource source, SmileEvent event, GraphicOverlay overlay) {
 		super(overlay);
-		this.smileEvent=smile;
+		this.smileEvent=event;
+//		this.done=picDone;
+		this.mCameraSource=source;
 		colorIndex = (colorIndex + 1) % COLORS.length;
 		final int selectedColor = COLORS[colorIndex];
 		
@@ -59,7 +67,7 @@ public class FaceMarkers extends GraphicOverlay.Graphic{
         center.setStyle(Paint.Style.STROKE);
 	}
 	
-	
+
 	
 	public void setId(int id){
 		this.mFaceId=id;
@@ -74,7 +82,7 @@ public class FaceMarkers extends GraphicOverlay.Graphic{
 	@Override
 	public void draw(Canvas canvas) {
 		Face face = mFace;
-		smileEvent.smiling(false);//callback
+//		smileEvent.smiling(false);//callback
 		if(face==null) return;
 		
 		float smile, eulerY, eulerZ;
@@ -84,8 +92,27 @@ public class FaceMarkers extends GraphicOverlay.Graphic{
 		
 		FaceVisionUtils.addSmile(smile);
 		if(FaceVisionUtils.isMakeSmile()) {
-			Log.v(TAG, "That was a smile, yeah!!!!!");
-			smileEvent.smiling(true);//smile callback - time to take a picture! TEST ONLY!
+			
+			if(FaceVisionUtils.getSmileNum()<1){
+				Log.v(TAG, "That was a smile, yeah!!!!!");
+				smileEvent.smiling(true);
+				FaceVisionUtils.increaseSmileNum();
+//				if(mCameraSource!=null){
+//					mCameraSource.takePicture(null, new CameraSource.PictureCallback() {
+//						
+//						@Override
+//						public void onPictureTaken(byte[] arg0) {
+//							Log.d(TAG, "picture callback!");
+//							if(arg0!=null) Log.d(TAG, "picture callback - byte[] size: "+arg0.length);
+//							else Log.d(TAG, "picture callback - byte[] is NULL!");
+//							FaceVisionUtils.setByteFace(arg0);
+//							done.isSaved(true);
+//							
+//						}} );
+//					
+//				}else Log.w(TAG, "takePicture(): camera source is null");
+			}
+			//smile callback - time to take a picture! TEST ONLY!
 		}
 		
 		//mark landmarks

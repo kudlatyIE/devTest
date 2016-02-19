@@ -5,14 +5,18 @@ import java.io.IOException;
 import com.example.utils.CameraStuff;
 import com.example.utils.Xyz;
 import com.example.visionface.CameraSourcePreview;
+import com.example.visionface.FaceInterfaces.PicDone;
+import com.example.visionface.FaceInterfaces.SmileEvent;
 import com.example.visionface.FaceMarkers;
 import com.example.visionface.FaceOverlay;
 import com.example.visionface.FaceVisionUtils;
 import com.example.visionface.GraphicOverlay;
-import com.example.visionface.SmileEvent;
+import com.example.visionface.FaceInterfaces;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.gms.vision.CameraSource;
+import com.google.android.gms.vision.CameraSource.PictureCallback;
+import com.google.android.gms.vision.CameraSource.ShutterCallback;
 import com.google.android.gms.vision.MultiProcessor;
 import com.google.android.gms.vision.Tracker;
 import com.google.android.gms.vision.face.Face;
@@ -25,8 +29,10 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Point;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
@@ -39,7 +45,7 @@ import android.view.View.OnClickListener;
 import android.widget.TextView;
 import android.widget.Toast;
 
-public class VisionFaceTrackerActivity extends AppCompatActivity implements SmileEvent{
+public class VisionFaceTrackerActivity extends AppCompatActivity{// implements PicDone{
 	
 	private final static String TAG = VisionFaceTrackerActivity.class.getSimpleName();
 	private final static int RC_HANDLE_GSM = 9001, RC_HANDLE_CAMERA_PERM = 2;//camera permission request code must be less than 256!
@@ -48,13 +54,18 @@ public class VisionFaceTrackerActivity extends AppCompatActivity implements Smil
 	private GraphicOverlay overlay;
 	private TextView tvInfo;
 	private int width, height;
+	
+
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_vision_face_tracker);
 		
-
+//		smileCall = new FaceInterfaces();
+//		saveCall = new FaceInterfaces();
+//		smileCall.registerSaveCallabck(this);
+//		saveCall.registerSaveCallabck(this);
 		
 		//set properly display size;
 		Display display = getWindowManager().getDefaultDisplay();
@@ -95,8 +106,6 @@ public class VisionFaceTrackerActivity extends AppCompatActivity implements Smil
 		Snackbar.make(overlay, R.string.permission_camera_rationale, Snackbar.LENGTH_INDEFINITE).setAction(R.string.ok, listener).show(); 
 	}
 	
-//	To be continue:
-//	https://github.com/googlesamples/android-vision/blob/master/visionSamples/FaceTracker/app/src/main/java/com/google/android/gms/samples/vision/face/facetracker/FaceTrackerActivity.java
 			
 	@TargetApi(23)
 	@Override
@@ -182,6 +191,7 @@ public class VisionFaceTrackerActivity extends AppCompatActivity implements Smil
 		if(cameraSource!=null){
 			try {
 				cameraPreview.start(cameraSource, overlay);
+				
 			} catch (IOException e) {
 				Log.e(TAG, "unable to start camera source: "+e.getMessage());
 				cameraSource.release();
@@ -213,14 +223,37 @@ public class VisionFaceTrackerActivity extends AppCompatActivity implements Smil
 			return new GraphicFaceTracker(overlay);
 		}
 	}
+
 	
 	private class GraphicFaceTracker extends Tracker<Face>{
 		private GraphicOverlay mOverlay;
 		private FaceMarkers mGraphic;
+		private final SmileEvent event = new SmileEvent(){
+
+			@Override
+			public void smiling(boolean isSmile) {
+				Toast.makeText(getApplicationContext(), "it is smiling!", Toast.LENGTH_SHORT).show();
+				cameraPreview.setSave(done);
+			}
+		};
+		
+		private final PicDone done = new PicDone(){
+
+			@Override
+			public void isSaved(boolean status) {
+				Log.d(TAG, "pic is saved!");
+				Intent intent = new Intent(VisionFaceTrackerActivity.this, DisplayFaceActivity.class);
+				intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+				startActivity(intent);
+				finish();
+			}
+		};
 		
 		GraphicFaceTracker(GraphicOverlay overlay){
 			this.mOverlay = overlay;
-			this.mGraphic = new FaceMarkers(VisionFaceTrackerActivity.this, overlay);
+			
+//			this.mGraphic = new FaceMarkers(cameraSource, event, done, overlay);
+			this.mGraphic = new FaceMarkers(cameraSource, event, overlay);
 		}
 
 		@Override
@@ -246,13 +279,52 @@ public class VisionFaceTrackerActivity extends AppCompatActivity implements Smil
 		
 		
 	}
+	
+	private class SavePic extends AsyncTask<byte[],Void, Void>{
 
-	@Override
-	public void smiling(boolean isSmaile) {
-		// TODO Auto-generated method stub
-		if(isSmaile) {  //create bitmap from camera source, release camera source and finish activity
-			Toast.makeText(getApplicationContext(), "it is smiling!", Toast.LENGTH_SHORT).show();
-			finish();
+		@Override
+		protected Void doInBackground(byte[]... params) {
+			Log.d(TAG, "start async task....");
+			FaceVisionUtils.setByteFace(params[0]);
+			if(cameraSource!=null) {
+				cameraSource.release();;
+				cameraSource=null;
+			}
+			return null;
+		}
+		
+		@Override
+		protected void onPostExecute(Void result) {
+			Log.d(TAG, "post extecite of async....");	
 		}
 	}
+
+
+	private PictureCallback pictureCallback = new CameraSource.PictureCallback() {
+		
+		@Override
+		public void onPictureTaken(byte[] arg0) {
+			if(arg0==null){
+				Log.d(TAG, "picture callback - byte[] is NULL: "+(arg0==null));
+			}else{
+				Log.d(TAG, "picture callback!");
+				Log.d(TAG, "picture callback - byte[] size: "+arg0.length);
+				new SavePic().execute(arg0);
+			}
+			
+		}
+	};
+
+
+//	@Override
+//	public void isSaved(boolean status) {
+//		if(status){
+//			Log.d(TAG, "pic is saved!");
+//			Intent intent = new Intent(VisionFaceTrackerActivity.this, DisplayFaceActivity.class);
+//			intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+//			startActivity(intent);
+//			finish();
+//		}
+//		
+//	}
 }

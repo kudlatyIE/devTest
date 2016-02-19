@@ -13,7 +13,6 @@ import android.util.Log;
 
 public class FaceVisionUtils {
 	
-	private static Xyz xy;
 	private final static float eulerYMax=10f, eulerZMax=5f, smileChange=0.4f;
 //	public final static String EYE_L="eye_left", EYE_R="eye_right",NOSE_BASE="nose_base", MOUTH_CENTER="mouth_center";
 	public final static Integer EYE_L = Landmark.LEFT_EYE, EYE_R=Landmark.RIGHT_EYE,
@@ -23,8 +22,46 @@ public class FaceVisionUtils {
 	private static List<Float> smileList;
 	private static float startSmile=0, endSmile, topSmile=0;
 	private static Bitmap btm;
-	private static HashMap<Integer, PointF> bioScore;
+	private static byte[] byteFace;
+	private static HashMap<Integer, PointF> bioScore; //biometric coordinates
+	private static double[] biometric;
+	private static int smileNum;
 	
+	public static byte[] getByteFace() {
+		return byteFace;
+	}
+
+	public static int getSmileNum() {
+		return smileNum;
+	}
+	public static void increaseSmileNum(){
+		smileNum = 2;
+	}
+
+	public static void setSmileNum(int smileNum) {
+		FaceVisionUtils.smileNum = smileNum;
+	}
+
+	public static void setByteFace(byte[] byteFace) {
+		FaceVisionUtils.byteFace = byteFace;
+	}
+
+	public static Bitmap getBtm() {
+		return btm;
+	}
+
+	public static double[] getBiometric() {
+		return biometric;
+	}
+
+	public static void setBtm(Bitmap btm) {
+		FaceVisionUtils.btm = btm;
+	}
+
+	public static void setBiometric(double[] biometric) {
+		FaceVisionUtils.biometric = biometric;
+	}
+
 	/**
 	 * return default screen size 480x640(width, height) if real size unknown
 	 * @return
@@ -43,6 +80,13 @@ public class FaceVisionUtils {
 //	public static void setSmile(List<Float> smile) {
 //		FaceVisionUtils.smileList = smile;
 //	}
+	
+	public static void resetSmile(){
+		topSmile=0;
+		startSmile=0;
+		smileList=null;
+		smileNum=0;
+	}
 	
 	/**
 	 * add new smile value (s) and update a highest value
@@ -65,7 +109,7 @@ public class FaceVisionUtils {
 	 */
 	public static boolean isMakeSmile(){
 		if(startSmile == 0f) return false;
-		if(smileList.size()==0) return false;
+		if(smileList==null) return false;
 //		float end = smileList.get(smileList.size()-1);
 //		return isSmile(startSmile, topSmile);
 		return(smileChange< Math.abs(startSmile-topSmile));

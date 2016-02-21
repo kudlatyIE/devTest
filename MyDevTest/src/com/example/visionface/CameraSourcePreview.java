@@ -40,6 +40,7 @@ public class CameraSourcePreview extends ViewGroup {
 		addView(this.mSurfaceView);
 	}
 
+	//working shit, just try do the same in FaceMarker
 	public void setSave(final PicDone done) {
 		this.picDone=done;
 //		this.save = save;
@@ -60,6 +61,12 @@ public class CameraSourcePreview extends ViewGroup {
 		}else Log.w(TAG, "takePicture(): camera source is null");
 	}
 
+	public int getSurfaceWidth(){
+		return mSurfaceView.getWidth();
+	}
+	public int getSurfaceHeight(){
+		return mSurfaceView.getHeight();
+	}
 
 	@Override
 	protected void onLayout(boolean changed, int left, int top, int right, int bottom) {

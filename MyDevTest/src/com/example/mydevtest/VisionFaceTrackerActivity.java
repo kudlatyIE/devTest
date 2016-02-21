@@ -233,7 +233,11 @@ public class VisionFaceTrackerActivity extends AppCompatActivity{// implements P
 			@Override
 			public void smiling(boolean isSmile) {
 				Toast.makeText(getApplicationContext(), "it is smiling!", Toast.LENGTH_SHORT).show();
+				// this is working shit, just try do the same in FaceMarker!
 				cameraPreview.setSave(done);
+				// stuff below was used to take pic (in CameraSourcePreview) when smile was detected (in FaceMarker)
+				// now picture is taken with camerasource and canvas in FaceMarker and here is only time to finish activity
+//				mGraphic.setSaveFace(done);
 			}
 		};
 		

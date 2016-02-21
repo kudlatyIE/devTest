@@ -10,6 +10,7 @@ import com.google.android.gms.vision.face.Face;
 import com.google.android.gms.vision.face.Landmark;
 
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -33,7 +34,10 @@ public class FaceMarkers extends GraphicOverlay.Graphic{
 	private static int smileNum = 0;
 	private CameraSource mCameraSource;
 	private SmileEvent smileEvent;
-	private PicDone done;
+//	private PicDone picDone;
+	private static Canvas mCanvas = null;
+	private Face face;
+	private static Bitmap btmFace, temp;
 	
 
 	public FaceMarkers(CameraSource source, SmileEvent event, GraphicOverlay overlay) {
@@ -78,11 +82,32 @@ public class FaceMarkers extends GraphicOverlay.Graphic{
 		postInvalidate();
 	}
 	
-
+	
+//	public void setSaveFace(final PicDone done) {
+//
+//		if(mCameraSource!=null){
+//			Log.w(TAG, "try to save in face maker");
+//			mCameraSource.takePicture(null, new CameraSource.PictureCallback() {
+//			
+//				@Override
+//				public void onPictureTaken(byte[] byteFace) {
+//					Log.d(TAG, "picture callback!");
+//					if(byteFace!=null) Log.d(TAG, "picture callback - byte[] size: "+byteFace.length);
+//					else Log.d(TAG, "picture callback - byte[] is NULL!");
+//					FaceVisionUtils.setByteFace(byteFace);
+//					done.isSaved(true);
+//			}} );
+//		
+//		}else Log.w(TAG, "takePicture(): camera source is null");
+//	}
+	
+	/**
+	 * TODO: when smile detected and face pose is correct, take pic and sent smileCallabck 
+	 */
 	@Override
-	public void draw(Canvas canvas) {
-		Face face = mFace;
-//		smileEvent.smiling(false);//callback
+	public void draw(final Canvas canvas) {
+		this.face = mFace;
+		
 		if(face==null) return;
 		
 		float smile, eulerY, eulerZ;
@@ -90,6 +115,12 @@ public class FaceMarkers extends GraphicOverlay.Graphic{
 		eulerY = face.getEulerY();
 		eulerZ = face.getEulerZ();
 		
+		//mark landmarks
+		for(Landmark mark: face.getLandmarks()){			
+			PointF pos = mark.getPosition();
+			canvas.drawPoint(translateMirrorX(pos.x), pos.y, landmarksPaint);
+		}
+
 		FaceVisionUtils.addSmile(smile);
 		if(FaceVisionUtils.isMakeSmile()) {
 			
@@ -97,17 +128,22 @@ public class FaceMarkers extends GraphicOverlay.Graphic{
 				Log.v(TAG, "That was a smile, yeah!!!!!");
 				smileEvent.smiling(true);
 				FaceVisionUtils.increaseSmileNum();
+				//take pic when smile detected!
 //				if(mCameraSource!=null){
+//					Log.w(TAG, "try to save in camerasource preview");
 //					mCameraSource.takePicture(null, new CameraSource.PictureCallback() {
 //						
 //						@Override
-//						public void onPictureTaken(byte[] arg0) {
+//						public void onPictureTaken(byte[] byteFace) {
 //							Log.d(TAG, "picture callback!");
-//							if(arg0!=null) Log.d(TAG, "picture callback - byte[] size: "+arg0.length);
+//							if(byteFace!=null) Log.d(TAG, "picture callback - byte[] size: "+byteFace.length);
 //							else Log.d(TAG, "picture callback - byte[] is NULL!");
-//							FaceVisionUtils.setByteFace(arg0);
-//							done.isSaved(true);
-//							
+//							FaceVisionUtils.setByteFace(byteFace);
+////							
+////							temp = BitmapFactory.decodeByteArray(byteFace, 0, byteFace.length);
+////							btmFace = temp.copy(Bitmap.Config.ARGB_8888, true);
+////							FaceVisionUtils.setBtm(btmFace);
+//
 //						}} );
 //					
 //				}else Log.w(TAG, "takePicture(): camera source is null");
@@ -115,14 +151,6 @@ public class FaceMarkers extends GraphicOverlay.Graphic{
 			//smile callback - time to take a picture! TEST ONLY!
 		}
 		
-		//mark landmarks
-		for(Landmark mark: face.getLandmarks()){
-			
-			PointF pos = mark.getPosition();
-			
-			canvas.drawPoint(translateMirrorX(pos.x), pos.y, landmarksPaint);
-			
-		}
 		
 		
 		//mark a face and eyes
@@ -134,34 +162,36 @@ public class FaceMarkers extends GraphicOverlay.Graphic{
 		x = 0; y = 0;
 //		canvas.drawCircle(x, y, FACE_POSITION_RADIUS, mFacePositionPaint);
 //		canvas.drawText("ID: "+mFaceId, x+ID_X_OFFSET, y + ID_Y_OFFSET, mIdPaint);
-		canvas.drawText("smile: "+String.format("%.2f", smile), x+ID_X_OFFSET, y + ID_Y_OFFSET, mIdPaint);
-		canvas.drawText("R eye: "+String.format("%.2f", face.getIsRightEyeOpenProbability()),x+ID_X_OFFSET, y + ID_Y_OFFSET*2, mIdPaint);
-		canvas.drawText("L eye: "+String.format("%.2f", face.getIsLeftEyeOpenProbability()), x+ID_X_OFFSET, y + ID_Y_OFFSET*3, mIdPaint);
-		canvas.drawText("Y angle: "+String.format("%.2f", eulerY), x+ID_X_OFFSET, y + ID_Y_OFFSET*4, mIdPaint);
-		canvas.drawText("Z angle: "+String.format("%.2f", eulerZ), x+ID_X_OFFSET, y + ID_Y_OFFSET*5, mIdPaint);
 		
-		PointF o = face.getPosition();//top left position!
 		
-		float w = face.getWidth(); float h = face.getHeight();
-//		Log.i(TAG, "Face Position X: "+o.x+" Y: "+o.y);
-//		Log.i(TAG, "Face Width: "+face.getWidth()+" Height: "+face.getHeight());
-		canvas.drawLine(o.x, o.y+h/2,o.x+w, o.y+h/2, landmarksPaint);
-		
-		//track face center
-		canvas.drawPoint(translateMirrorX(o.x+w/2),o.y+h/2, center);
-
-		
-		float xOffset, yOffset, left, top, right,bottom;
-
-		xOffset = scaleX(face.getWidth()/2f);
-		yOffset = scaleY(face.getHeight()/2f);
-
-		left = x;
-		right = x + ID_Y_OFFSET*6;
-		top = y;
-		bottom = y+ ID_Y_OFFSET*6+10;
-		
-		canvas.drawRect(left, top, right, bottom, mBoxPaint);
+//		canvas.drawText("smile: "+String.format("%.2f", smile), x+ID_X_OFFSET, y + ID_Y_OFFSET, mIdPaint);
+//		canvas.drawText("R eye: "+String.format("%.2f", face.getIsRightEyeOpenProbability()),x+ID_X_OFFSET, y + ID_Y_OFFSET*2, mIdPaint);
+//		canvas.drawText("L eye: "+String.format("%.2f", face.getIsLeftEyeOpenProbability()), x+ID_X_OFFSET, y + ID_Y_OFFSET*3, mIdPaint);
+//		canvas.drawText("Y angle: "+String.format("%.2f", eulerY), x+ID_X_OFFSET, y + ID_Y_OFFSET*4, mIdPaint);
+//		canvas.drawText("Z angle: "+String.format("%.2f", eulerZ), x+ID_X_OFFSET, y + ID_Y_OFFSET*5, mIdPaint);
+//		
+//		PointF o = face.getPosition();//top left position!
+//		
+//		float w = face.getWidth(); float h = face.getHeight();
+////		Log.i(TAG, "Face Position X: "+o.x+" Y: "+o.y);
+////		Log.i(TAG, "Face Width: "+face.getWidth()+" Height: "+face.getHeight());
+//		canvas.drawLine(o.x, o.y+h/2,o.x+w, o.y+h/2, landmarksPaint);
+//		
+//		//track face center
+//		canvas.drawPoint(translateMirrorX(o.x+w/2),o.y+h/2, center);
+//
+//		
+//		float xOffset, yOffset, left, top, right,bottom;
+//
+//		xOffset = scaleX(face.getWidth()/2f);
+//		yOffset = scaleY(face.getHeight()/2f);
+//
+//		left = x;
+//		right = x + ID_Y_OFFSET*6;
+//		top = y;
+//		bottom = y+ ID_Y_OFFSET*6+10;
+//		
+//		canvas.drawRect(left, top, right, bottom, mBoxPaint);
 		
 	}
 	

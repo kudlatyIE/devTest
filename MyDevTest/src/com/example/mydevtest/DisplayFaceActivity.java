@@ -31,45 +31,13 @@ public class DisplayFaceActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		
 		setContentView(R.layout.activity_display_face);
-		
-		FaceLandmarker land = new FaceLandmarker(this);
 		tvInfo = (TextView) findViewById(R.id.displayface_info_txt);
 		tvInfo.setVisibility(View.GONE);
 		img = (ImageView) findViewById(R.id.displayface_img);
-		Bitmap btmFace=null;
-		byte[]  byteFace = FaceVisionUtils.getByteFace();
-		if(byteFace!=null){
 		
-			Bitmap temp = BitmapFactory.decodeByteArray(byteFace, 0, byteFace.length);
-			face = rotatedImg(temp.copy(Bitmap.Config.ARGB_8888, true),90);
-			
-		}else Log.e(TAG, "byte[] is null!");//tvInfo.setText("Doopa!\nbyte[] is NULL: "+(byteFace==null));
+		Bitmap b = FaceVisionUtils.getBtm();
+		if(b!=null) img.setImageBitmap(b);
 		
-		
-		try {
-			btmFace = land.addMarks(face);
-		} catch (Exception e) {
-			Log.e(TAG, "try add landmarks: "+e.getMessage());
-			//TODO: return to face scanning! and reset all singletons!
-			face=null;
-			
-			Intent intent = new Intent(this, VisionFaceTrackerActivity.class);
-			intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-			startActivity(intent);
-			finish();
-		}finally{
-			FaceVisionUtils.resetFaces();
-			FaceVisionUtils.resetSmile();
-		}
-		
-		if(btmFace==null){
-			FaceVisionUtils.resetFaces();
-			FaceVisionUtils.resetSmile();
-			Log.e(TAG, " new bitmap is null!");
-		}else {
-			img.setImageBitmap(btmFace);
-			Log.e(TAG, " new bitmap with landmarks!");
-		}
 //		if(byteFace!=null){
 //			
 //			Bitmap temp = BitmapFactory.decodeByteArray(byteFace, 0, byteFace.length);
@@ -80,10 +48,5 @@ public class DisplayFaceActivity extends Activity {
 //		else tvInfo.setText("Doopa!\nbyte[] is NULL: "+(byteFace==null));
 	}
 	
-	private Bitmap rotatedImg(Bitmap b, int angle){
-		Matrix matrix = new Matrix();
-		matrix.postRotate(angle);
-		matrix.preScale(-1, 1);
-		return Bitmap.createBitmap(b, 0, 0, b.getWidth(), b.getHeight(), matrix, true);
-	}
+	
 }

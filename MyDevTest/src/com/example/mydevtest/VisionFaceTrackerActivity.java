@@ -235,11 +235,15 @@ public class VisionFaceTrackerActivity extends Activity{// implements PicDone{
 			@Override
 			public void smiling(boolean isSmile) {
 				if(isSmile){
-					Toast.makeText(getApplicationContext(), "it is smiling!", Toast.LENGTH_SHORT).show();
-					Intent intent = new Intent(VisionFaceTrackerActivity.this, DisplayFaceActivity.class);
-					intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-					startActivity(intent);
-					finish();
+					if(FaceVisionUtils.landmarkValidator(VisionFaceTrackerActivity.this)){
+						Toast.makeText(getApplicationContext(), "it is smiling!", Toast.LENGTH_SHORT).show();
+						Intent intent = new Intent(VisionFaceTrackerActivity.this, DisplayFaceActivity.class);
+						intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+						startActivity(intent);
+						finish();
+					}else{
+						Log.d(TAG, "didn't found full landmark, try agian....");
+					}
 				}
 				// this is working shit, just try do the same in FaceMarker!
 //				cameraPreview.setSave(done);

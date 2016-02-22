@@ -4,10 +4,15 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import com.example.mydevtest.VisionFaceTrackerActivity;
 import com.example.utils.Xyz;
 import com.google.android.gms.vision.face.Landmark;
 
+import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Matrix;
 import android.graphics.PointF;
 import android.util.Log;
 
@@ -119,6 +124,53 @@ public class FaceVisionUtils {
 //		float end = smileList.get(smileList.size()-1);
 //		return isSmile(startSmile, topSmile);
 		return(smileChange< Math.abs(startSmile-topSmile));
+	}
+	
+	public static boolean landmarkValidator(Context context){
+		boolean result = false;
+		FaceLandmarker land = new FaceLandmarker(context);
+		
+		Bitmap btmFace=null, face = null, temp;
+		
+		byte[]  byteFace = FaceVisionUtils.getByteFace();
+		if(byteFace!=null){
+		
+			temp = BitmapFactory.decodeByteArray(byteFace, 0, byteFace.length);
+			face = rotatedImg(temp.copy(Bitmap.Config.ARGB_8888, true),90);
+			
+		}else {
+			Log.e(TAG, "byte[] is null!");//tvInfo.setText("Doopa!\nbyte[] is NULL: "+(byteFace==null));
+			return false;
+		}
+		
+		try {
+			
+			btm = land.addMarks(face);
+			Log.d(TAG, "new bitmap created with landmarks");
+			result = true;
+		} catch (Exception e) {
+			Log.e(TAG, "try add landmarks: "+e.getMessage());
+			//TODO: return to face scanning! and reset all singletons!
+			face=null;
+			result = false;
+			FaceVisionUtils.resetFaces();
+			FaceVisionUtils.resetSmile();
+		}
+		
+		if(btm==null){
+			FaceVisionUtils.resetFaces();
+			FaceVisionUtils.resetSmile();
+			Log.e(TAG, " new bitmap is null!");
+			result = false;
+		}
+		return result;
+	}
+	
+	private static Bitmap rotatedImg(Bitmap b, int angle){
+		Matrix matrix = new Matrix();
+		matrix.postRotate(angle);
+		matrix.preScale(-1, 1);
+		return Bitmap.createBitmap(b, 0, 0, b.getWidth(), b.getHeight(), matrix, true);
 	}
 	
 	public static void createLandmark(int landmark, PointF value){

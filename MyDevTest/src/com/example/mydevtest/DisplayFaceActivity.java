@@ -3,7 +3,9 @@ package com.example.mydevtest;
 import com.example.visionface.FaceLandmarker;
 import com.example.visionface.FaceVisionUtils;
 
+import android.app.ActionBar;
 import android.app.Activity;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
@@ -27,6 +29,7 @@ public class DisplayFaceActivity extends Activity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		
 		setContentView(R.layout.activity_display_face);
 		
 		FaceLandmarker land = new FaceLandmarker(this);
@@ -47,12 +50,22 @@ public class DisplayFaceActivity extends Activity {
 			btmFace = land.addMarks(face);
 		} catch (Exception e) {
 			Log.e(TAG, "try add landmarks: "+e.getMessage());
-			e.printStackTrace();
+			//TODO: return to face scanning! and reset all singletons!
+			face=null;
+			
+			Intent intent = new Intent(this, VisionFaceTrackerActivity.class);
+			intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+			startActivity(intent);
+			finish();
+		}finally{
+			FaceVisionUtils.resetFaces();
+			FaceVisionUtils.resetSmile();
 		}
 		
 		if(btmFace==null){
-			img.setImageBitmap(face);
-			Log.e(TAG, " new bitmap is null, display old!");
+			FaceVisionUtils.resetFaces();
+			FaceVisionUtils.resetSmile();
+			Log.e(TAG, " new bitmap is null!");
 		}else {
 			img.setImageBitmap(btmFace);
 			Log.e(TAG, " new bitmap with landmarks!");

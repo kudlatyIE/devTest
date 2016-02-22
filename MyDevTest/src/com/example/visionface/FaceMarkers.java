@@ -22,10 +22,10 @@ import android.widget.Toast;
 public class FaceMarkers extends GraphicOverlay.Graphic{
 	
 	private final static String TAG = FaceMarkers.class.getSimpleName();
-	private final static float FACE_POSITION_RADIUS = 10f, ID_TEXT_SIZE= 30f, ID_X_OFFSET=20f, ID_Y_OFFSET=50f, BOX_STROKE = 5f;
+	private final static float FACE_POSITION_RADIUS = 10f, ID_TEXT_SIZE= 40f, ID_X_OFFSET=20f, ID_Y_OFFSET=50f, BOX_STROKE = 5f;
 	private final static int [] COLORS = {Color.RED, Color.BLUE, Color.CYAN, Color.MAGENTA, Color.WHITE, Color.YELLOW};
 	private static int colorIndex = 0;
-	private Paint mFacePositionPaint, mIdPaint, mBoxPaint, landmarksPaint, center;
+	private Paint mFacePositionPaint, mIdPaint, mBoxPaint, landmarksPaint, center, msgBoxPaint, msgBoxBorder;
 	private volatile Face mFace;
 	private int mFaceId;
 	private float mFaceHappiness;
@@ -45,9 +45,10 @@ public class FaceMarkers extends GraphicOverlay.Graphic{
 		this.smileEvent=event;
 //		this.done=picDone;
 		this.mCameraSource=source;
-		colorIndex = (colorIndex + 1) % COLORS.length;
-		final int selectedColor = COLORS[colorIndex];
+//		colorIndex = (colorIndex + 1) % COLORS.length;
+//		final int selectedColor = COLORS[colorIndex];
 		
+		final int selectedColor = Color.WHITE;
 		mFacePositionPaint = new Paint();
 		mFacePositionPaint.setColor(selectedColor);
 		
@@ -59,6 +60,14 @@ public class FaceMarkers extends GraphicOverlay.Graphic{
 		mBoxPaint.setColor(selectedColor);
 		mBoxPaint.setStyle(Paint.Style.STROKE);
 		mBoxPaint.setStrokeWidth(BOX_STROKE);
+		
+		msgBoxPaint = new Paint();
+		msgBoxPaint.setColor(Color.BLACK);
+		msgBoxPaint.setStyle(Paint.Style.FILL);
+		msgBoxBorder = new Paint();
+		msgBoxBorder.setColor(Color.RED);
+		msgBoxBorder.setStyle(Paint.Style.STROKE);
+	
 		
 		landmarksPaint = new Paint();
         landmarksPaint.setStrokeWidth(10);
@@ -109,6 +118,14 @@ public class FaceMarkers extends GraphicOverlay.Graphic{
 		this.face = mFace;
 		
 		if(face==null) return;
+		//info position in box
+		float x,y,  left, top, right,bottom;		
+		x = 0; y = 0;
+
+		left = x;
+		right = canvas.getWidth();//x + ID_Y_OFFSET*6;
+		top = y;
+		bottom = y+ ID_Y_OFFSET+10;
 		
 		float smile, eulerY, eulerZ;
 		smile = face.getIsSmilingProbability();
@@ -120,46 +137,50 @@ public class FaceMarkers extends GraphicOverlay.Graphic{
 			PointF pos = mark.getPosition();
 			canvas.drawPoint(translateMirrorX(pos.x), pos.y, landmarksPaint);
 		}
-
-		FaceVisionUtils.addSmile(smile);
-		if(FaceVisionUtils.isMakeSmile()) {
-			
-			if(FaceVisionUtils.getSmileNum()<1){
-				Log.v(TAG, "That was a smile, yeah!!!!!");
-				smileEvent.smiling(true);
-				FaceVisionUtils.increaseSmileNum();
-				//take pic when smile detected!
-//				if(mCameraSource!=null){
-//					Log.w(TAG, "try to save in camerasource preview");
-//					mCameraSource.takePicture(null, new CameraSource.PictureCallback() {
-//						
-//						@Override
-//						public void onPictureTaken(byte[] byteFace) {
-//							Log.d(TAG, "picture callback!");
-//							if(byteFace!=null) Log.d(TAG, "picture callback - byte[] size: "+byteFace.length);
-//							else Log.d(TAG, "picture callback - byte[] is NULL!");
-//							FaceVisionUtils.setByteFace(byteFace);
-////							
-////							temp = BitmapFactory.decodeByteArray(byteFace, 0, byteFace.length);
-////							btmFace = temp.copy(Bitmap.Config.ARGB_8888, true);
-////							FaceVisionUtils.setBtm(btmFace);
-//
-//						}} );
-//					
-//				}else Log.w(TAG, "takePicture(): camera source is null");
+		if(FaceVisionUtils.isPoseCorrect(eulerY, eulerZ)){
+			FaceVisionUtils.addSmile(smile);//detect smile when face is posing
+			if(FaceVisionUtils.isMakeSmile()) {
+				
+				if(FaceVisionUtils.getSmileNum()<1){
+					Log.v(TAG, "That was a smile, yeah!!!!!");
+//					smileEvent.smiling(true);
+					FaceVisionUtils.increaseSmileNum();
+					//take pic when smile detected!
+					if(mCameraSource!=null){
+						Log.w(TAG, "try to save camerasource preview in FaceMarkers");
+						mCameraSource.takePicture(null, new CameraSource.PictureCallback() {
+							
+							@Override
+							public void onPictureTaken(byte[] byteFace) {
+								Log.d(TAG, "picture callback!");
+								if(byteFace!=null) Log.d(TAG, "picture callback - byte[] size: "+byteFace.length);
+								else Log.d(TAG, "picture callback - byte[] is NULL!");
+								FaceVisionUtils.setByteFace(byteFace);
+								smileEvent.smiling(true);
+							}} );
+						
+						
+					}else {
+						Log.w(TAG, "takePicture(): camera source is null");
+					}
+				}
+				//smile callback - time to take a picture! TEST ONLY!
+			}else{
+				//TODO: text canvas: please smile to camera
+				canvas.drawRect(left, top, right, bottom, msgBoxPaint);
+				canvas.drawRect(left, top, right, bottom, msgBoxBorder);
+				canvas.drawText("Please smile", x+ID_X_OFFSET, y + ID_Y_OFFSET, mIdPaint);
 			}
-			//smile callback - time to take a picture! TEST ONLY!
+		}else{
+			FaceVisionUtils.resetSmile();
+			//TDOD: text canvas: please look straight to camera and smile
+			canvas.drawRect(left, top, right, bottom, msgBoxPaint);
+			canvas.drawRect(left, top, right, bottom, msgBoxBorder);
+			canvas.drawText("Please, look at camera and smile", x+ID_X_OFFSET, y + ID_Y_OFFSET, mIdPaint);
 		}
 		
-		
-		
-		//mark a face and eyes
-		
-		float x,y;
-		
 
-		//info position in box
-		x = 0; y = 0;
+		
 //		canvas.drawCircle(x, y, FACE_POSITION_RADIUS, mFacePositionPaint);
 //		canvas.drawText("ID: "+mFaceId, x+ID_X_OFFSET, y + ID_Y_OFFSET, mIdPaint);
 		

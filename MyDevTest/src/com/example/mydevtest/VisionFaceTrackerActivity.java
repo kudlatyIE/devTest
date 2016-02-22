@@ -45,7 +45,7 @@ import android.view.View.OnClickListener;
 import android.widget.TextView;
 import android.widget.Toast;
 
-public class VisionFaceTrackerActivity extends AppCompatActivity{// implements PicDone{
+public class VisionFaceTrackerActivity extends Activity{// implements PicDone{
 	
 	private final static String TAG = VisionFaceTrackerActivity.class.getSimpleName();
 	private final static int RC_HANDLE_GSM = 9001, RC_HANDLE_CAMERA_PERM = 2;//camera permission request code must be less than 256!
@@ -66,7 +66,8 @@ public class VisionFaceTrackerActivity extends AppCompatActivity{// implements P
 //		saveCall = new FaceInterfaces();
 //		smileCall.registerSaveCallabck(this);
 //		saveCall.registerSaveCallabck(this);
-		
+		FaceVisionUtils.resetFaces();
+		FaceVisionUtils.resetSmile();
 		//set properly display size;
 		Display display = getWindowManager().getDefaultDisplay();
 		Point size = new Point();
@@ -228,13 +229,20 @@ public class VisionFaceTrackerActivity extends AppCompatActivity{// implements P
 	private class GraphicFaceTracker extends Tracker<Face>{
 		private GraphicOverlay mOverlay;
 		private FaceMarkers mGraphic;
+		
 		private final SmileEvent event = new SmileEvent(){
 
 			@Override
 			public void smiling(boolean isSmile) {
-				Toast.makeText(getApplicationContext(), "it is smiling!", Toast.LENGTH_SHORT).show();
+				if(isSmile){
+					Toast.makeText(getApplicationContext(), "it is smiling!", Toast.LENGTH_SHORT).show();
+					Intent intent = new Intent(VisionFaceTrackerActivity.this, DisplayFaceActivity.class);
+					intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+					startActivity(intent);
+					finish();
+				}
 				// this is working shit, just try do the same in FaceMarker!
-				cameraPreview.setSave(done);
+//				cameraPreview.setSave(done);
 				// stuff below was used to take pic (in CameraSourcePreview) when smile was detected (in FaceMarker)
 				// now picture is taken with camerasource and canvas in FaceMarker and here is only time to finish activity
 //				mGraphic.setSaveFace(done);

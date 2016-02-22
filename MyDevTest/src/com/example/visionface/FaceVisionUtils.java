@@ -13,13 +13,14 @@ import android.util.Log;
 
 public class FaceVisionUtils {
 	
-	private final static float eulerYMax=10f, eulerZMax=5f, smileChange=0.4f;
+	private static final String TAG= FaceVisionUtils.class.getSimpleName();
+	private final static float eulerYMax=5f, eulerZMax=5f, smileChange=0.4f;
 //	public final static String EYE_L="eye_left", EYE_R="eye_right",NOSE_BASE="nose_base", MOUTH_CENTER="mouth_center";
 	public final static Integer EYE_L = Landmark.LEFT_EYE, EYE_R=Landmark.RIGHT_EYE,
 							MOUTH_L = Landmark.LEFT_MOUTH, MOUTH_R = Landmark.RIGHT_MOUTH,
 							MOUTH_B = Landmark.BOTTOM_MOUTH, NOSE = Landmark.NOSE_BASE;
 	
-	private static List<Float> smileList;
+	private static List<Float> smileList=null;
 	private static float startSmile=0, endSmile, topSmile=0;
 	private static Bitmap btm;
 	private static byte[] byteFace;
@@ -29,6 +30,11 @@ public class FaceVisionUtils {
 	
 	public static byte[] getByteFace() {
 		return byteFace;
+	}
+	
+	public static void resetFaces(){
+		btm = null;
+		byteFace=null;
 	}
 
 	public static int getSmileNum() {
@@ -133,14 +139,36 @@ public class FaceVisionUtils {
 		}
 	}
 	
+	public static boolean checkAllLandmarksDoopa(int landmark){
+		
+		switch(landmark){
+		case Landmark.LEFT_EYE: return true;
+		case Landmark.RIGHT_EYE: return true;
+		case Landmark.NOSE_BASE: return true;
+		case Landmark.RIGHT_MOUTH: return true;
+		case Landmark.LEFT_MOUTH: return true;
+		case Landmark.BOTTOM_MOUTH: return true;
+		case Landmark.LEFT_CHEEK: return true;
+		case Landmark.RIGHT_CHEEK: return true;
+		default: return false;
+		}
+	}
+	
+	public static int[] allLandmarks(){
+		int [] all={Landmark.LEFT_EYE, Landmark.RIGHT_EYE, Landmark.NOSE_BASE, Landmark.RIGHT_MOUTH, 
+				Landmark.LEFT_MOUTH, Landmark.BOTTOM_MOUTH,Landmark.LEFT_CHEEK, Landmark.RIGHT_CHEEK};
+		
+		return all;
+	}
+	
 	private static boolean isSmile(float s1, float s2){
 		if(smileChange > Math.abs(s1-s2)) return false;
 		return true;
 	}
 	
 	public static boolean isPoseCorrect(float eulerY, float eulerZ){
-		
-		if(eulerZ<eulerZMax && eulerY<eulerYMax) return true;
+//		Log.d(TAG, "eulerY: "+eulerY +" eulerZ: "+eulerZ);
+		if(Math.abs(eulerZ)<eulerZMax && Math.abs(eulerY)<eulerYMax) return true;
 		return false;
 	}
 	

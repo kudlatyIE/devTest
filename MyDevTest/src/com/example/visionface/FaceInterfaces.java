@@ -24,10 +24,6 @@ public class FaceInterfaces {
 	public void registerSaveCallabck(SavePicture save){
 		savePic=save;
 	}
-	
-	
-	
-	
-	
+
 
 }

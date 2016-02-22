@@ -54,8 +54,7 @@ public class FaceLandmarker {
 			eulerZ = f.getEulerZ();
 			Log.d(TAG, "eulerY: "+eulerY +" eulerZ: "+eulerZ);
 			if(!FaceVisionUtils.isPoseCorrect(eulerY, eulerZ)) {
-//				FaceVisionUtils.resetFaces();
-//				FaceVisionUtils.resetSmile();
+
 				detector.release();
 				throw new Exception("Incorrec pose!");
 			}
@@ -67,8 +66,6 @@ public class FaceLandmarker {
 			List<Landmark> myList = f.getLandmarks();
 			int[] all = FaceVisionUtils.allLandmarks();
 			if(myList.size()!=all.length) {
-//				FaceVisionUtils.resetFaces();
-//				FaceVisionUtils.resetSmile();
 				detector.release();
 				throw new Exception("Missing landmark!");
 			}else{
@@ -76,16 +73,15 @@ public class FaceLandmarker {
 				
 					PointF p = l.getPosition();
 					canvas.drawPoint(p.x, p.y, landmarkPaint);
+					FaceVisionUtils.createLandmark(l.getType(), p);// create map of faces landmarks
 				}
+				
 			}
 		}else {
-//			FaceVisionUtils.resetFaces();
-//			FaceVisionUtils.resetSmile();
+
 			detector.release();
 			throw new Exception("No face found!");
 		}
-//		FaceVisionUtils.resetFaces();
-//		FaceVisionUtils.resetSmile();
 		detector.release();
 		return bitmap;
 	}

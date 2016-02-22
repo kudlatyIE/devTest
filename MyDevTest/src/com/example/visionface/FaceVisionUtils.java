@@ -6,6 +6,8 @@ import java.util.List;
 
 import com.example.mydevtest.VisionFaceTrackerActivity;
 import com.example.utils.Xyz;
+import com.google.android.gms.vision.face.Face;
+import com.google.android.gms.vision.face.FaceDetector;
 import com.google.android.gms.vision.face.Landmark;
 
 import android.content.Context;
@@ -29,7 +31,7 @@ public class FaceVisionUtils {
 	private static float startSmile=0, endSmile, topSmile=0;
 	private static Bitmap btm;
 	private static byte[] byteFace;
-	private static HashMap<Integer, PointF> bioScore; //biometric coordinates
+	private static HashMap<Integer, PointF> bioLandmark = null; //biometric coordinates
 	private static double[] biometric;
 	private static int smileNum;
 	
@@ -72,26 +74,15 @@ public class FaceVisionUtils {
 	public static void setBiometric(double[] biometric) {
 		FaceVisionUtils.biometric = biometric;
 	}
-
-	/**
-	 * return default screen size 480x640(width, height) if real size unknown
-	 * @return
-	 */
-//	public static Xyz getXy() {
-//		if(xy==null) return new Xyz(480, 640);
-//		return xy;
-//	}
-//	public static void setXy(Xyz xy) {
-//		FaceVisionUtils.xy = xy;
-//	}
-//
-//	public static List<Float> getSmile() {
-//		return smileList;
-//	}
-//	public static void setSmile(List<Float> smile) {
-//		FaceVisionUtils.smileList = smile;
-//	}
 	
+	public static HashMap<Integer, PointF> getBioLandmark() {
+		return bioLandmark;
+	}
+
+	public static void setBioLandmark(HashMap<Integer, PointF> bioLandmark) {
+		FaceVisionUtils.bioLandmark = bioLandmark;
+	}
+
 	public static void resetSmile(){
 		topSmile=0;
 		startSmile=0;
@@ -121,46 +112,34 @@ public class FaceVisionUtils {
 	public static boolean isMakeSmile(){
 		if(startSmile == 0f) return false;
 		if(smileList==null) return false;
-//		float end = smileList.get(smileList.size()-1);
-//		return isSmile(startSmile, topSmile);
 		return(smileChange< Math.abs(startSmile-topSmile));
 	}
 	
 	public static boolean landmarkValidator(Context context){
 		boolean result = false;
+		Bitmap face = null, temp;
 		FaceLandmarker land = new FaceLandmarker(context);
-		
-		Bitmap btmFace=null, face = null, temp;
-		
+
 		byte[]  byteFace = FaceVisionUtils.getByteFace();
 		if(byteFace!=null){
 		
 			temp = BitmapFactory.decodeByteArray(byteFace, 0, byteFace.length);
 			face = rotatedImg(temp.copy(Bitmap.Config.ARGB_8888, true),90);
-			
+			try {
+				
+				btm = land.addMarks(face);
+				Log.d(TAG, "new bitmap created with landmarks");
+				result = true;
+			} catch (Exception e) {
+				Log.e(TAG, "try add landmarks: "+e.getMessage());
+				//TODO: return to face scanning! and reset all singletons!
+				face=null;
+				result = false;
+				FaceVisionUtils.resetFaces();
+				FaceVisionUtils.resetSmile();
+			}
 		}else {
 			Log.e(TAG, "byte[] is null!");//tvInfo.setText("Doopa!\nbyte[] is NULL: "+(byteFace==null));
-			return false;
-		}
-		
-		try {
-			
-			btm = land.addMarks(face);
-			Log.d(TAG, "new bitmap created with landmarks");
-			result = true;
-		} catch (Exception e) {
-			Log.e(TAG, "try add landmarks: "+e.getMessage());
-			//TODO: return to face scanning! and reset all singletons!
-			face=null;
-			result = false;
-			FaceVisionUtils.resetFaces();
-			FaceVisionUtils.resetSmile();
-		}
-		
-		if(btm==null){
-			FaceVisionUtils.resetFaces();
-			FaceVisionUtils.resetSmile();
-			Log.e(TAG, " new bitmap is null!");
 			result = false;
 		}
 		return result;
@@ -174,23 +153,26 @@ public class FaceVisionUtils {
 	}
 	
 	public static void createLandmark(int landmark, PointF value){
-		if(FaceVisionUtils.bioScore == null) bioScore = new HashMap<Integer, PointF>();
+		if(FaceVisionUtils.bioLandmark == null) bioLandmark = new HashMap<Integer, PointF>();
 		switch(landmark){
 		case Landmark.LEFT_EYE:
-			bioScore.put(Integer.valueOf(Landmark.LEFT_EYE), value); break;
+			bioLandmark.put(Integer.valueOf(Landmark.LEFT_EYE), value); break;
 		case Landmark.RIGHT_EYE:
-			bioScore.put(Landmark.RIGHT_EYE, value); break;
+			bioLandmark.put(Landmark.RIGHT_EYE, value); break;
 		case Landmark.NOSE_BASE:
-			bioScore.put(Landmark.NOSE_BASE, value); break;
+			bioLandmark.put(Landmark.NOSE_BASE, value); break;
 		case Landmark.RIGHT_MOUTH:
-			bioScore.put(Landmark.RIGHT_MOUTH, value); break;
+			bioLandmark.put(Landmark.RIGHT_MOUTH, value); break;
 		case Landmark.LEFT_MOUTH:
-			bioScore.put(Landmark.LEFT_MOUTH, value); break;
+			bioLandmark.put(Landmark.LEFT_MOUTH, value); break;
 		case Landmark.BOTTOM_MOUTH:
-			bioScore.put(Landmark.BOTTOM_MOUTH, value); break;
+			bioLandmark.put(Landmark.BOTTOM_MOUTH, value); break;
+		
 		}
+	
 	}
 	
+	//not used
 	public static boolean checkAllLandmarksDoopa(int landmark){
 		
 		switch(landmark){
@@ -209,7 +191,6 @@ public class FaceVisionUtils {
 	public static int[] allLandmarks(){
 		int [] all={Landmark.LEFT_EYE, Landmark.RIGHT_EYE, Landmark.NOSE_BASE, Landmark.RIGHT_MOUTH, 
 				Landmark.LEFT_MOUTH, Landmark.BOTTOM_MOUTH,Landmark.LEFT_CHEEK, Landmark.RIGHT_CHEEK};
-		
 		return all;
 	}
 	

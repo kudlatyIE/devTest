@@ -191,15 +191,15 @@ public class FaceMarkers extends GraphicOverlay.Graphic{
 //		canvas.drawText("Y angle: "+String.format("%.2f", eulerY), x+ID_X_OFFSET, y + ID_Y_OFFSET*4, mIdPaint);
 //		canvas.drawText("Z angle: "+String.format("%.2f", eulerZ), x+ID_X_OFFSET, y + ID_Y_OFFSET*5, mIdPaint);
 //		
-//		PointF o = face.getPosition();//top left position!
+		PointF o = face.getPosition();//top left position!
 //		
-//		float w = face.getWidth(); float h = face.getHeight();
-////		Log.i(TAG, "Face Position X: "+o.x+" Y: "+o.y);
-////		Log.i(TAG, "Face Width: "+face.getWidth()+" Height: "+face.getHeight());
+		float w = face.getWidth(); float h = face.getHeight();
+//		Log.i(TAG, "Face Position X: "+o.x+" Y: "+o.y);
+//		Log.i(TAG, "Face Width: "+face.getWidth()+" Height: "+face.getHeight());
 //		canvas.drawLine(o.x, o.y+h/2,o.x+w, o.y+h/2, landmarksPaint);
 //		
 //		//track face center
-//		canvas.drawPoint(translateMirrorX(o.x+w/2),o.y+h/2, center);
+		canvas.drawPoint(translateMirrorX(o.x+w/2),o.y+h/2, center);
 //
 //		
 //		float xOffset, yOffset, left, top, right,bottom;

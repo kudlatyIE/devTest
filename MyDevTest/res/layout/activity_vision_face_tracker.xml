@@ -13,14 +13,12 @@
     
     <com.example.visionface.CameraSourcePreview 
         android:id="@+id/visionface_preview"
-        
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         >
         
         <com.example.visionface.GraphicOverlay 
         	android:id="@+id/visionface_overlay"
-        	
         	android:layout_width="match_parent"
         	android:layout_height="match_parent"
         />

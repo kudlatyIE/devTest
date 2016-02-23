@@ -1,6 +1,7 @@
 package com.example.mydevtest;
 
 import java.io.IOException;
+import java.util.HashMap;
 
 import com.example.utils.CameraStuff;
 import com.example.utils.Xyz;
@@ -32,6 +33,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Point;
+import android.graphics.PointF;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
@@ -79,6 +81,8 @@ public class VisionFaceTrackerActivity extends Activity{// implements PicDone{
 		tvInfo = (TextView) findViewById(R.id.visionface_text_info);
 		
 		tvInfo.setVisibility(View.GONE);
+		
+		
 		int rc = ActivityCompat.checkSelfPermission(this, Manifest.permission.CAMERA);
 		if(rc==PackageManager.PERMISSION_GRANTED){
 			createCameraSource();
@@ -230,12 +234,20 @@ public class VisionFaceTrackerActivity extends Activity{// implements PicDone{
 		private GraphicOverlay mOverlay;
 		private FaceMarkers mGraphic;
 		
+		private HashMap<Integer, PointF> map;
+		private double[] bio;
 		private final SmileEvent event = new SmileEvent(){
 
 			@Override
 			public void smiling(boolean isSmile) {
 				if(isSmile){
 					if(FaceVisionUtils.landmarkValidator(VisionFaceTrackerActivity.this)){
+						map = FaceVisionUtils.getBioLandmark();
+						bio = FaceVisionUtils.extracSensiBio(map);
+						for(double d: bio){
+							Log.i(TAG, "Biometric: "+d);
+						}
+						//extract biometric from landmarks hashMap and pass it on
 						Toast.makeText(getApplicationContext(), "it is smiling!", Toast.LENGTH_SHORT).show();
 						Intent intent = new Intent(VisionFaceTrackerActivity.this, DisplayFaceActivity.class);
 						intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);

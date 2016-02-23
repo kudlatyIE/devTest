@@ -45,8 +45,9 @@ public class FaceLandmarker {
 		Frame frame = new Frame.Builder().setBitmap(bitmap).build();
 		SparseArray<Face> faces = detector.detect(frame);
 		Face f;
-		float smile, eulerY, eulerZ;
-		
+		float smile, eulerY, eulerZ, faceCenterX, faceCenterY;
+		//check point for biometric: bitmap dimensions;
+		Log.d(TAG, "bitmap_W: "+bitmap.getWidth()+" bitmap_H: "+bitmap.getHeight());
 		if(faces.size()>0) {
 			f = faces.valueAt(0);
 			smile = f.getIsSmilingProbability();
@@ -69,13 +70,19 @@ public class FaceLandmarker {
 				detector.release();
 				throw new Exception("Missing landmark!");
 			}else{
+				faceCenterX=f.getPosition().x+f.getWidth()/2;
+				faceCenterY=f.getPosition().y+f.getHeight()/2;
+				Log.d(TAG, "faceCenter X: "+faceCenterX+" Y: "+faceCenterY);
+				//add face center point to hashMap of collected landmarks! (check if granted than zero, just in case);
 				for(Landmark l: myList){
 				
 					PointF p = l.getPosition();
-					canvas.drawPoint(p.x, p.y, landmarkPaint);
-					FaceVisionUtils.createLandmark(l.getType(), p);// create map of faces landmarks
+					canvas.drawCircle(p.x, p.y, 2f, landmarkPaint);
+					FaceVisionUtils.createLandmark(l.getType(), p);// create map of faces landmarks for biometric extractor!
 				}
-				
+				if(faceCenterX > 0 && faceCenterY > 0 ) FaceVisionUtils.addCenterFace(FaceVisionUtils.FACE_CENTER, faceCenterX, faceCenterY);
+				else throw new Exception("not valid face center coordinates: X: "+faceCenterX+" Y: "+faceCenterY);
+//				canvas.drawPoint(faceCenterX, faceCenterY, landmarkPaint);
 			}
 		}else {
 

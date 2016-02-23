@@ -4,14 +4,11 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import com.example.mydevtest.VisionFaceTrackerActivity;
-import com.example.utils.Xyz;
-import com.google.android.gms.vision.face.Face;
-import com.google.android.gms.vision.face.FaceDetector;
+import com.example.utils.BitmapUtils;
 import com.google.android.gms.vision.face.Landmark;
 
+import android.app.Activity;
 import android.content.Context;
-import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
@@ -25,7 +22,7 @@ public class FaceVisionUtils {
 //	public final static String EYE_L="eye_left", EYE_R="eye_right",NOSE_BASE="nose_base", MOUTH_CENTER="mouth_center";
 	public final static Integer EYE_L = Landmark.LEFT_EYE, EYE_R=Landmark.RIGHT_EYE,
 							MOUTH_L = Landmark.LEFT_MOUTH, MOUTH_R = Landmark.RIGHT_MOUTH,
-							MOUTH_B = Landmark.BOTTOM_MOUTH, NOSE = Landmark.NOSE_BASE;
+							MOUTH_B = Landmark.BOTTOM_MOUTH, NOSE = Landmark.NOSE_BASE, FACE_CENTER=99;
 	
 	private static List<Float> smileList=null;
 	private static float startSmile=0, endSmile, topSmile=0;
@@ -115,16 +112,17 @@ public class FaceVisionUtils {
 		return(smileChange< Math.abs(startSmile-topSmile));
 	}
 	
-	public static boolean landmarkValidator(Context context){
+	public static boolean landmarkValidator(Activity ac){
 		boolean result = false;
 		Bitmap face = null, temp;
-		FaceLandmarker land = new FaceLandmarker(context);
+		FaceLandmarker land = new FaceLandmarker(ac);
 
 		byte[]  byteFace = FaceVisionUtils.getByteFace();
 		if(byteFace!=null){
 		
 			temp = BitmapFactory.decodeByteArray(byteFace, 0, byteFace.length);
 			face = rotatedImg(temp.copy(Bitmap.Config.ARGB_8888, true),90);
+			face = BitmapUtils.resizeBitmapForBiometric(ac, face);
 			try {
 				
 				btm = land.addMarks(face);
@@ -170,6 +168,11 @@ public class FaceVisionUtils {
 		
 		}
 	
+	}
+	
+	public static void addCenterFace(int land, float x, float y) throws Exception{
+		if(FaceVisionUtils.bioLandmark == null) throw new Exception("try to add face center Point to not existing Face landmarks");
+		bioLandmark.put(land, new PointF(x, y));
 	}
 	
 	//not used

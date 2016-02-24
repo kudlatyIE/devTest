@@ -228,12 +228,10 @@ public class VisionFaceTrackerActivity extends Activity{// implements PicDone{
 			return new GraphicFaceTracker(overlay);
 		}
 	}
-
 	
 	private class GraphicFaceTracker extends Tracker<Face>{
 		private GraphicOverlay mOverlay;
 		private FaceMarkers mGraphic;
-		
 		private HashMap<Integer, PointF> map;
 		private double[] bio;
 		private final SmileEvent event = new SmileEvent(){
